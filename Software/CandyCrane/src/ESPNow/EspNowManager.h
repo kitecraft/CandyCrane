@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include <esp_now.h>
 #include "EspNowMessage.h"
 #include "EspNowIncomingMessageQueue.h"
 

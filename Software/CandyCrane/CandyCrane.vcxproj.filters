@@ -55,9 +55,15 @@
     <ClInclude Include="src\Utilities\IceFS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Crane\CraneController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ESPNow\EspNowIncomingMessageQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Crane\CraneController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,13 +3,14 @@
  Created:	3/26/2022 12:17:55 PM
  Author:	Kitecraft
 */
-#include <esp_now.h>
+#include <Arduino.h>
 #include "src/CC_Config.h"
 #include "src/Network/Network.h"
 #include "src/Network/CCWebServer.h"
 #include "src/Network/OTAManager.h"
 #include "src/ESPNow/EspNowManager.h"
 #include "src/ESPNow/EspNowIncomingMessageQueue.h"
+#include "src/Crane/CraneController.h"
 
 WiFiClient g_wifiClient;
 TaskHandle_t g_webServerHandler = nullptr;
@@ -17,15 +18,22 @@ TaskHandle_t g_OTAHandler = nullptr;
 
 EspNowIncomingMessageQueue g_espNowMessageQueue;
 
+CraneController g_craneController;
+TaskHandle_t g_CraneControllerHandle = nullptr;
+void IRAM_ATTR CraneControllerThread(void*)
+{
+    g_craneController.Run();
+}
 
 
+/*
 #define NEXT_BUCKET_ACTION_DELAY 3000
 unsigned long nextBucketAction = 0;
 bool ccBucketStatus = false;
 
 #define NEXT_GET_DISTANCE_ACTION_DELAY 5000
 unsigned long nextGetDistanceAction = 0;
-
+*/
 
 bool setupComplete = true;
 void setup() {
@@ -56,7 +64,17 @@ void setup() {
     }
 
 
-    Serial.println("\n\n---\nStarting");
+    Serial.println("Starting the crane");
+    if (g_craneController.StartUp())
+    {
+        xTaskCreatePinnedToCore(CraneControllerThread, "Crane Control Loop", STACK_SIZE, nullptr, CRANE_CONTROL_PRIORITY, &g_CraneControllerHandle, CRANE_CONTROL_CORE);
+    } else
+    {
+        Serial.println("The Candy Crane has failed to start.  As such, I will now refuse to continue.");
+        while (true) {}
+    }
+
+    Serial.println("\n\n---\nStartup has completed.  Running....");
 }
 
 
