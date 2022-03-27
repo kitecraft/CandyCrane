@@ -9,7 +9,7 @@ class CraneController
 private:
 
 public:
-	CraneController();
+	bool StartUp();
 	void Run();
 	
 };
