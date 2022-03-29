@@ -5,85 +5,39 @@
 */
 #include <ESP8266WiFi.h>
 #include <espnow.h>
+#include "src/CB_Config.h"
+#include "src/ESPNow/CandyCraneCommands.h"
+#include "src/ESPNow/EspNowManager.h"
+#include "src/ESPNow/EspNowIncomingMessageQueue.h"
 #include "ServoEasing.hpp"
 #include <Wire.h>
 #include <VL53L0X.h>
 
-enum CANDY_CRANE_COMMANDS {
-    CC_NONE = -1,
-    CC_OPEN_BUCKET,
-    CC_CLOSE_BUCKET,
-    CC_BUCKET_MOVE_COMPLETE,
-    CC_GET_DISTANCE,
-    CC_START_DISTANCE_STREAM,
-    CC_END_DISTANCE_STREAM,
-
-    CC_ACK_COMMAND,
-};
-
-
-/*  Start ESPNOW() stuff */
-uint8_t broadcastAddress[] = { 0x3C, 0x71, 0xBF, 0x44, 0x7B, 0x68};
-
-typedef struct struct_message {
-    int command = CC_NONE;
-    uint16_t value = -1;
-} struct_message;
-struct_message espNowIncomingMessage;
-bool espNowDataReceived = false;
-
-void OnDataSent(uint8_t* mac_addr, uint8_t sendStatus) {
-    //Serial.print("Last Packet Send Status: ");
-    if (sendStatus == 0) {
-        //Serial.println("Delivery success");
-    }
-    else {
-        Serial.println("Last Packet Send Status: Delivery fail");
-    }
-}
-
-void OnDataRecv(uint8_t* mac, uint8_t* incomingData, uint8_t len) {
-    memcpy(&espNowIncomingMessage, incomingData, sizeof(espNowIncomingMessage));
-
-    espNowDataReceived = true;
-}
-/*  end ESPNOW() stuff */
-
-
-#define BUCKET_CLOSED_ANGLE  127
-#define BUCKET_OPEN_ANGLE 39
-#define BUCKET_OPEN_SPEED 240
-#define BUCKET_OPEN_WAIT_TIME 500
-#define BUCKET_CLOSE_SPEED 80
-#define BUCKET_CLOSE_WAIT_TIME 1500
-#define SERVO1_PIN 3
+EspNowIncomingMessageQueue g_espNowMessageQueue;
 
 ServoEasing BucketServo;
 VL53L0X bucketRanger;
 
 
 void setup() {
-    Serial.begin(115200);
-    WiFi.mode(WIFI_STA);
+    //Serial.begin(115200);
+    Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
+    Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
     Wire.begin(2, 0);
 
-    // Init ESP-NOW
-    if (esp_now_init() != 0) {
-        Serial.println("Error initializing ESP-NOW");
-        return;
+    Serial.println("Starting ESPNow");
+    if (!InitEspNow())
+    {
+        Serial.println("\n\nFailed to start ESPNow stuff.  As such, I will now refuse to continue.");
+        while (true) {}
     }
-
-    esp_now_register_send_cb(OnDataSent);
-    esp_now_set_self_role(ESP_NOW_ROLE_COMBO);
-    esp_now_register_recv_cb(OnDataRecv);
-    esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_COMBO, 1, NULL, 0);
 
 
     bucketRanger.setTimeout(500);
     if (!bucketRanger.init())
     {
-        Serial.println("Failed to detect and initialize sensor!");
-        while (1) {}
+        Serial.println("Failed to detect and initialize sensor!  As such, I will now refuse to continue.");
+        while (true) {}
     }
 
     if (BucketServo.attach(SERVO1_PIN, BUCKET_CLOSED_ANGLE) == INVALID_SERVO) {
@@ -91,52 +45,51 @@ void setup() {
     }
 
 
-    CloseBucket();
+    OpenBucket();
     Serial.println("\n\n---\nStarting");
 }
 
 void loop() {
-    if (espNowDataReceived)
-    {
-        HandleEspNowData();
-        espNowDataReceived = false;
-    }
+    HandleEspNowData();
 }
 
 void HandleEspNowData()
 {
-    CANDY_CRANE_COMMANDS currCommand = static_cast<CANDY_CRANE_COMMANDS>(espNowIncomingMessage.command);
-    switch (currCommand) {
-    case CC_OPEN_BUCKET:
-        Serial.println("Opening");
-        OpenBucket();
-        SendEspNowAck();
-        break;
-    case CC_CLOSE_BUCKET:
-        Serial.println("Closing");
-        CloseBucket();
-        SendEspNowAck();
-        break;
-    case CC_GET_DISTANCE:
-        SendEspNowAck();
-        SendSingleDistance();
-        break;
-    case CC_START_DISTANCE_STREAM:
-        SendEspNowAck();
-        break;
-    case CC_END_DISTANCE_STREAM:
-        SendEspNowAck();
-        break;
-    default:
-        break;
-    };
+    if (!g_espNowMessageQueue.IsQueueEmpty()) {
+        EspNowMessage currMessage = g_espNowMessageQueue.GetNextItem();
+        switch (currMessage.command) {
+        case CC_PING:
+            SendEspNowCommand(CC_PONG);
+            break;
+        case CC_OPEN_BUCKET:
+            Serial.println("Opening");
+            OpenBucket();
+            SendEspNowAck();
+            break;
+        case CC_CLOSE_BUCKET:
+            Serial.println("Closing");
+            CloseBucket();
+            SendEspNowAck();
+            break;
+        case CC_GET_DISTANCE:
+            SendEspNowAck();
+            SendSingleDistance();
+            break;
+        case CC_START_DISTANCE_STREAM:
+            SendEspNowAck();
+            break;
+        case CC_END_DISTANCE_STREAM:
+            SendEspNowAck();
+            break;
+        default:
+            break;
+        };
+    }
 }
 
 void SendEspNowAck()
 {
-    struct_message commandResult;
-    commandResult.command = CC_ACK_COMMAND;
-    esp_now_send(broadcastAddress, (uint8_t*)&commandResult, sizeof(commandResult));
+    SendEspNowCommand(CC_ACK_COMMAND);
 }
 
 void OpenBucket()
@@ -153,8 +106,5 @@ void CloseBucket()
 
 void SendSingleDistance()
 {
-    struct_message commandResult;
-    commandResult.command = CC_GET_DISTANCE;
-    commandResult.value = bucketRanger.readRangeSingleMillimeters();
-    esp_now_send(broadcastAddress, (uint8_t*)&commandResult, sizeof(commandResult));
+    SendEspNowCommand(CC_BUCKET_DISTANCE, bucketRanger.readRangeSingleMillimeters());
 }

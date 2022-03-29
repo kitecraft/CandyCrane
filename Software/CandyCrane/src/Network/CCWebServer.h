@@ -6,8 +6,6 @@
 
 static void RunWebServer()
 {
-    WiFi.softAPdisconnect(true);
-
     WebServer server(80);
     server.on("/", [&]() {
         String htmlText = IceFS_ReadFile("/web/index.html");

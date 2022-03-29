@@ -1,0 +1,12 @@
+#pragma once
+
+#define __DEVICE_NAME__ "CCBucket"
+#define __DEVICE_VERSION__ "0.1"
+
+#define SERVO1_PIN 3
+#define BUCKET_CLOSED_ANGLE  127
+#define BUCKET_OPEN_ANGLE 39
+#define BUCKET_OPEN_SPEED 240
+#define BUCKET_OPEN_WAIT_TIME 500
+#define BUCKET_CLOSE_SPEED 80
+#define BUCKET_CLOSE_WAIT_TIME 1500

@@ -1,10 +1,10 @@
 #pragma once
 #include <Arduino.h>
 #include <WiFi.h>
+#include <esp_wifi.h>
 #include "../CC_Config.h"
 #include "../Utilities/PreferencesManager.h"
 
-extern WiFiClient g_wifiClient;
 
 static bool connectToNetwork()
 {
@@ -20,7 +20,7 @@ static bool connectToNetwork()
     while (tryCount <= NETWORK_TRY_TIMES) {
         Serial.printf("Try #%i to connect to network '%s'\n", tryCount, GetSsid());
         WiFi.disconnect();
-        WiFi.begin(GetSsid().c_str(), GetSsidPassword().c_str());
+        WiFi.begin(GetSsid().c_str(), GetSsidPassword().c_str(), 1);
         int waitCount = 0;
         while (waitCount < NETWORK_WAIT_TIME_PER_TRY * 2) {
             if (WiFi.status() == WL_CONNECTED) {
