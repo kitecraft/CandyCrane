@@ -23,7 +23,8 @@ void CraneController::StartUp()
 
 bool CraneController::WaitforBucketConnect()
 {
-	Serial.println("Finding bucket");
+	Serial.println("\nFinding bucket");
+	_bucketHeartbeatsWaiting = 0;
 	while (!_bucketConnected)
 	{
 		if (SendBucketHeartbeat())

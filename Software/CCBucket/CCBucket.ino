@@ -29,7 +29,7 @@ void setup() {
     if (!InitEspNow())
     {
         Serial.println("\n\nFailed to start ESPNow stuff.  As such, I will now refuse to continue.");
-        while (true) {}
+        while (true) { delay(1); }
     }
 
 
@@ -37,7 +37,7 @@ void setup() {
     if (!bucketRanger.init())
     {
         Serial.println("Failed to detect and initialize sensor!  As such, I will now refuse to continue.");
-        while (true) {}
+        while (true) { delay(1); }
     }
 
     if (BucketServo.attach(SERVO1_PIN, BUCKET_CLOSED_ANGLE) == INVALID_SERVO) {

@@ -92,7 +92,7 @@ void setup() {
     if (!InitEspNow())
     {
         Serial.println("Failed to setup EspNow.  As such, I will now refuse to continue.");
-        while (true) {}
+        while (true) { delay(1); }
     }
 
     Serial.println("Starting the crane");
