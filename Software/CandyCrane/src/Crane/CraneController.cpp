@@ -3,6 +3,9 @@
 
 void CraneController::StartUp()
 {
+	_muxBucketDistance = portMUX_INITIALIZER_UNLOCKED;
+	_muxBucketMotion = portMUX_INITIALIZER_UNLOCKED;
+
 	while(!_bucketConnected){
 		WaitforBucketConnect();
 	}
@@ -10,6 +13,10 @@ void CraneController::StartUp()
 		Serial.println("Failed to get distance");
 		// trigger general error condition
 	}
+
+	CloseBucket();
+
+
 	Serial.printf("Bucket distance is: '%i'", _bucketDistance);
 
 }
@@ -41,7 +48,44 @@ bool CraneController::GetBucketDistance()
 	}
 	unsigned long endWait = millis() + BUCKET_COMMAND_WAIT_TIME;
 	while (millis() < endWait) {
-		if(_bucketDistance != BUCKET_NO_DISTANCE)
+		portENTER_CRITICAL(&_muxBucketDistance);
+		uint32_t distance = _bucketDistance;
+		portEXIT_CRITICAL(&_muxBucketDistance);
+		
+		if(distance != BUCKET_NO_DISTANCE)
+		{
+			return true;
+		}
+		delay(5);
+	}
+	return false;
+}
+
+bool CraneController::OpenBucket()
+{
+	return OpenCloseBucket(CC_OPEN_BUCKET);
+}
+
+bool CraneController::CloseBucket()
+{
+	return OpenCloseBucket(CC_CLOSE_BUCKET);
+}
+
+bool CraneController::OpenCloseBucket(CANDY_CRANE_COMMANDS openclose)
+{
+	_bucketMoveComplete = false;
+	if (!SendEspNowCommand(openclose))
+	{
+		return false;
+	}
+
+	unsigned long endWait = millis() + BUCKET_MOVE_WAIT_TIME;
+	while (millis() < endWait) {
+		portENTER_CRITICAL(&_muxBucketMotion);
+		bool state = _bucketMoveComplete;
+		portEXIT_CRITICAL(&_muxBucketMotion);
+
+		if (state)
 		{
 			return true;
 		}
@@ -73,7 +117,7 @@ void CraneController::Run()
 	}
 
 	//StartUp();
-	
+	int counter = 0;
 	while (true) {
 		/*
 		if (!_bucketConnected) {
@@ -81,8 +125,35 @@ void CraneController::Run()
 			WaitforBucketConnect();
 		}
 		*/
+		counter++;
+		GetBucketDistance();
+		Serial.printf("%i Bucket distance is: '%i'\n",counter, _bucketDistance);
+		delay(500);
 
-		delay(1);
+		if (_nextMove < millis())
+		{
+			if (_bucketState)
+			{
+				Serial.println("Closing the bucket, dear Liza, dear Liza");
+				if (CloseBucket()) {
+					Serial.println("Bucket has been closed");
+				}
+				else {
+					Serial.println("Failed to close bucket");
+				}
+			}
+			else {
+				Serial.println("Opening the bucket, dear Liza, dear Liza");
+				if (OpenBucket()) {
+					Serial.println("Bucket has been opened");
+				}
+				else {
+					Serial.println("Failed to open bucket");
+				}
+			}
+			_bucketState = !_bucketState;
+			_nextMove = millis() + 5000;
+		}
 	}
 }
 
@@ -98,12 +169,23 @@ void CraneController::RunQueueHandler()
 				_bucketHeartbeatsWaiting = 0;
 				break;
 			case CC_BUCKET_DISTANCE:
+				portENTER_CRITICAL(&_muxBucketDistance);
 				_bucketDistance = currentMessage.value;
+				portEXIT_CRITICAL(&_muxBucketDistance);
+				break;
+			case CC_BUCKET_MOVE_COMPLETE:
+				portENTER_CRITICAL(&_muxBucketMotion);
+				_bucketMoveComplete = true;
+				portEXIT_CRITICAL(&_muxBucketMotion);
 				break;
 			default:
+				Serial.print("Found an oddity in the queue!");
+				Serial.print(currentMessage.command);
+				Serial.print("  -  ");
+				Serial.println(currentMessage.value);
 				break;
 			}
 		}
-		delay(2);
+		delay(1);
 	}
 }

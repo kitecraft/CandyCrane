@@ -112,12 +112,12 @@ void setup() {
         &g_CraneControllerHandle, 
         CRANE_CONTROL_CORE);
 
-    Serial.println("\n\n---\nRunning....");
+    Serial.println("\n\n---\nBeginning Run mode.  Don't get fat!");
 }
 
 
 void loop() {
-    HandleEspNowData();
+    //HandleEspNowData();
 
     /*
     if (nextBucketAction < millis())

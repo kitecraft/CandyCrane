@@ -2,7 +2,7 @@
 
 EspNowIncomingMessageQueue::EspNowIncomingMessageQueue()
 {
-	ArduinoQueue<EspNowMessage> messageQueue(3);
+	ArduinoQueue<EspNowMessage> messageQueue(5);
 	commandQueueMutex = portMUX_INITIALIZER_UNLOCKED;
 }
 

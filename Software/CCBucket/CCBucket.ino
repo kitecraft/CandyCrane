@@ -62,17 +62,12 @@ void HandleEspNowData()
             SendEspNowCommand(CC_PONG);
             break;
         case CC_OPEN_BUCKET:
-            Serial.println("Opening");
             OpenBucket();
-            SendEspNowAck();
             break;
         case CC_CLOSE_BUCKET:
-            Serial.println("Closing");
             CloseBucket();
-            SendEspNowAck();
             break;
         case CC_GET_DISTANCE:
-            SendEspNowAck();
             SendSingleDistance();
             break;
         case CC_START_DISTANCE_STREAM:
@@ -95,16 +90,27 @@ void SendEspNowAck()
 void OpenBucket()
 {
     BucketServo.easeTo(BUCKET_OPEN_ANGLE, BUCKET_OPEN_SPEED);
-    delay(BUCKET_OPEN_WAIT_TIME);
+    while (BucketServo.isMoving())
+    {
+        delay(2);
+    }
+    //delay(BUCKET_OPEN_WAIT_TIME);
+    SendEspNowCommand(CC_BUCKET_MOVE_COMPLETE);
 }
 
 void CloseBucket()
 {
     BucketServo.easeTo(BUCKET_CLOSED_ANGLE, BUCKET_CLOSE_SPEED);
-    delay(BUCKET_CLOSE_WAIT_TIME);
+    while (BucketServo.isMoving())
+    {
+        delay(2);
+    }
+    SendEspNowCommand(CC_BUCKET_MOVE_COMPLETE);
 }
 
 void SendSingleDistance()
 {
-    SendEspNowCommand(CC_BUCKET_DISTANCE, bucketRanger.readRangeSingleMillimeters());
+    uint32_t distance = bucketRanger.readRangeSingleMillimeters();
+    Serial.printf("Distance: '%i'\n", distance);
+    SendEspNowCommand(CC_BUCKET_DISTANCE, distance);
 }
