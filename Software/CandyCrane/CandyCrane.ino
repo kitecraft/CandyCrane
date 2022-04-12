@@ -3,23 +3,21 @@
  Created:	3/26/2022 12:17:55 PM
  Author:	Kitecraft
 */
+#include <EEPROM.h>
 #include <Arduino.h>
 #include <WiFi.h>
 #include "src/CC_Config.h"
-//#include "src/Network/Network.h"
-//#include "src/Network/CCWebServer.h"
-//#include "src/Network/OTAManager.h"
-#include "src/ESPNow/EspNowManager.h"
-#include "src/ESPNow/EspNowIncomingMessageQueue.h"
 #include "src/Crane/CraneController.h"
+#include "src/ESPNow/EspNowMessageQueue.h"
+#include "src/ESPNow/EspNowManager.h"
+#include "src/Utilities/ButtonManager.h"
+#include "src/Utilities/ButtonMap.h"
 
-TaskHandle_t g_webServerHandler = nullptr;
-TaskHandle_t g_OTAHandler = nullptr;
-
-EspNowIncomingMessageQueue g_espNowMessageQueue;
-
+EspNowMessageQueue g_espNowMessageQueue;
 CraneController g_craneController;
 TaskHandle_t g_CraneControllerHandle = nullptr;
+ButtonManager g_buttonManager;
+
 void IRAM_ATTR CraneControllerThread(void*)
 {
     g_craneController.Run();
@@ -31,62 +29,15 @@ void IRAM_ATTR CraneControllerQueueThread(void*)
 }
 
 
-/*
-#define NEXT_BUCKET_ACTION_DELAY 3000
-unsigned long nextBucketAction = 0;
-bool ccBucketStatus = false;
-
-#define NEXT_GET_DISTANCE_ACTION_DELAY 5000
-unsigned long nextGetDistanceAction = 0;
-*/
 
 bool setupComplete = true;
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(57600);
+    Wire.begin(21, 22);
+    
     Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
 
-    /*
-    Serial.println("Beginning network connection");
-    if (!connectToNetwork())
-    {
-        Serial.println("Failed to connect to network.  Start local webserver");
-        setupComplete = false;
-
-        xTaskCreatePinnedToCore(handleLocalWebSever, 
-            "WebServer Loop", 
-            STACK_SIZE, 
-            nullptr, 
-            WEB_SERVER_PRIORITY, 
-            &g_webServerHandler, 
-            WEBSERVER_CORE);
-        //display error here
-    }
-    else {
-        Serial.println("Connected to network succesfully.  Starting webserver.");
-
-        xTaskCreatePinnedToCore(handleWebSever, 
-            "WebServer Loop", 
-            STACK_SIZE, 
-            nullptr, 
-            WEB_SERVER_PRIORITY, 
-            &g_webServerHandler, 
-            WEBSERVER_CORE);
-
-        Serial.println("Started webserver handler.  Starting OTA Handler");
-
-        xTaskCreatePinnedToCore(handleOTA, 
-            "OTA Loop", 
-            STACK_SIZE, 
-            nullptr, 
-            OTA_PRIORITY, 
-            &g_OTAHandler, 
-            OTA_CORE);
-
-        Serial.println("Started OTA handler");
-    }
-    delay(2000);
-    */
-
+    g_buttonManager.Init(MCP_BUTTON_CONTROLLER_ADDRESS, MCP_BUTTON_CONTROLLER_INTERUPT_PIN);
 
     Serial.println("Beginning EspNow connection");
     if (!InitEspNow())
@@ -103,7 +54,7 @@ void setup() {
         &g_CraneControllerQueueHandle, 
         CRANE_CONTROL_QUEUE_HANDLER_CORE);
 
-
+    
     g_craneController.StartUp();
     xTaskCreatePinnedToCore(CraneControllerThread, 
         "Crane Control Loop", 
@@ -111,57 +62,67 @@ void setup() {
         CRANE_CONTROL_PRIORITY, 
         &g_CraneControllerHandle, 
         CRANE_CONTROL_CORE);
-
-    Serial.println("\n\n---\nBeginning Run mode.  Don't get fat!");
+        
+    Serial.println("\n\n---\nBeginning Run mode.");
 }
 
 
 void loop() {
-    //HandleEspNowData();
+    
+    HandleButtonPress();
 
-    /*
-    if (nextBucketAction < millis())
-    {
-        if (ccBucketStatus)
-        {
-            Serial.print("Sending Close... ");
-            SendEspNowCommand(CC_CLOSE_BUCKET);
-        }
-        else
-        {
-            Serial.print("Sending Open... ");
-            SendEspNowCommand(CC_OPEN_BUCKET);
-        }
-        
-        ccBucketStatus = !ccBucketStatus;
-        nextBucketAction = millis() + NEXT_BUCKET_ACTION_DELAY;
-        Serial.println("Command has been sent");
-    }
-
-    if (nextGetDistanceAction < millis())
-    {
-        Serial.print("Requesting distance... ");
-        SendEspNowCommand(CC_GET_DISTANCE);
-        Serial.println("Distance Requested");
-        nextGetDistanceAction = millis() + NEXT_GET_DISTANCE_ACTION_DELAY;
-    }
-    */
+    delay(1);
 }
 
-void HandleEspNowData()
+void StopAll()
 {
-    if (!g_espNowMessageQueue.IsQueueEmpty())
+
+}
+
+void StopAllAndHome()
+{
+
+}
+
+
+void HandleButtonPress()
+{
+    int button = g_buttonManager.HandleButtonInterrupt();
+
+    if (button != NO_PIN)
     {
-        EspNowMessage message = g_espNowMessageQueue.GetNextItem();
-        switch (message.command) {
-        case CC_ACK_COMMAND:
-            Serial.println("Acked");
+        Serial.printf("Button pressed: '%i'\n", button);
+        switch (button) {
+        case btn_Emergency_StopHome:
             break;
-        case CC_GET_DISTANCE:
-            Serial.printf("Distance: '%i'", message.value);
+        case btn_Tower_Forward:
             break;
-        default:
+        case btn_Tower_StopHome:
             break;
-        };
+        case btn_Tower_Backward:
+            break;
+        case btn_Dolly_Outwards:
+            g_craneController.MoveDollyOutwards();
+            break;
+        case btn_Dolly_StopHome:
+            g_craneController.IsDollyInMotion() ?
+                g_craneController.StopDolly() : 
+                g_craneController.RecalibrateDolly();
+            break;
+        case btn_Dolly_Inwards:
+            g_craneController.MoveDollyInwards();
+            break;
+        case btn_Bucket_Up:
+            break;
+        case btn_Bucket_StopHome:
+            break;
+        case btn_Bucket_Down:
+            break;
+        case btn_Bucket_Open:
+            break;
+        case btn_Bucket_Close:
+            break;
+
+        }
     }
 }

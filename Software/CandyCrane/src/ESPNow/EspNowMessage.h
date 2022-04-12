@@ -4,12 +4,19 @@
 
 typedef struct EspNowMessage {
     int command = CC_NONE;
-    uint16_t value = -1;
+    uint16_t distance = -1;
+    uint16_t angle = -1;
+    uint16_t speed = -1;
 
     EspNowMessage() {}
+    EspNowMessage(CANDY_CRANE_COMMANDS newCommand) {
+        command = newCommand;
+    }
     EspNowMessage(const EspNowMessage& orig)
     {
         command = orig.command;
-        value = orig.value;
+        distance = orig.distance;
+        angle = orig.angle;
+        speed = orig.speed;
     }
 } EspNowMessage;

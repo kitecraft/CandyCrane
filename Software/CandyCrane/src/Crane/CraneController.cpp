@@ -1,25 +1,64 @@
 #include "CraneController.h"
-#include "../ESPNow/EspNowManager.h"
 
 void CraneController::StartUp()
 {
 	_muxBucketDistance = portMUX_INITIALIZER_UNLOCKED;
-	_muxBucketMotion = portMUX_INITIALIZER_UNLOCKED;
+	_muxBucketOpenClose = portMUX_INITIALIZER_UNLOCKED;
 
-	while(!_bucketConnected){
+	_dolly.Init();
+
+	_ropeBarrelStepper = new CheapStepper(ROPE_BARREL_STEPPER_PIN_1, ROPE_BARREL_STEPPER_PIN_2, ROPE_BARREL_STEPPER_PIN_3, ROPE_BARREL_STEPPER_PIN_4);
+	//_ropeBarrelStepper.connectToPins(ROPE_BARREL_STEPPER_PIN_1, ROPE_BARREL_STEPPER_PIN_2, ROPE_BARREL_STEPPER_PIN_3, ROPE_BARREL_STEPPER_PIN_4);
+	//_ropeBarrelStepper.setSpeedInStepsPerSecond(ROPE_BARREL_STEPPER_SPEED);
+	//_ropeBarrelStepper.setAccelerationInStepsPerSecondPerSecond(ROPE_BARREL_STEPPER_ACCEL);
+	
+	CalibrateAll();
+}
+
+bool CraneController::CalibrateBucket()
+{
+	while (!_bucketConnected) {
 		WaitforBucketConnect();
 	}
-	if (!GetBucketDistance()) {
-		Serial.println("Failed to get distance");
-		// trigger general error condition
-	}
-
 	CloseBucket();
-
-
+	if (!GetBucketDistance())
+	{
+		Serial.println("CalibrateBucket(): Failed to get bucket distance.");
+		return false;
+	}
 	Serial.printf("Bucket distance is: '%i'", _bucketDistance);
 
+	int distanceToMove = _bucketDistance - BUCKET_HOME_DISTANCE;
+
+
+	return true;
 }
+
+bool CraneController::CalibrateTower()
+{
+	return true;
+}
+
+bool CraneController::CalibrateAll()
+{
+	//if (!CalibrateBucket())
+	//{
+	//	return false;
+	//}
+
+	if (!_dolly.Calibrate())
+	{
+		return false;
+	}
+
+	if (!CalibrateTower())
+	{
+		return false;
+	}
+
+	return true;
+}
+
 
 bool CraneController::WaitforBucketConnect()
 {
@@ -34,7 +73,7 @@ bool CraneController::WaitforBucketConnect()
 		if (_bucketHeartbeatsWaiting >= BUCKET_LOST_PONG_COUNT) {
 			return false;
 		}
-		delay(10);
+		vTaskDelay(10);
 	}
 	Serial.println("\nBucket has been found");
 	return true;
@@ -42,11 +81,9 @@ bool CraneController::WaitforBucketConnect()
 
 bool CraneController::GetBucketDistance()
 {
-	_bucketDistance = BUCKET_NO_DISTANCE;
-	if (!SendEspNowCommand(CC_GET_DISTANCE))
-	{
-		return false;
-	}
+	SendEspNowCommand(CC_GET_DISTANCE);
+
+	// wait for distance to be updated
 	unsigned long endWait = millis() + BUCKET_COMMAND_WAIT_TIME;
 	while (millis() < endWait) {
 		portENTER_CRITICAL(&_muxBucketDistance);
@@ -57,40 +94,42 @@ bool CraneController::GetBucketDistance()
 		{
 			return true;
 		}
-		delay(5);
+		vTaskDelay(5);
 	}
 	return false;
 }
 
 bool CraneController::OpenBucket()
 {
-	return OpenCloseBucket(CC_OPEN_BUCKET);
+	return OpenCloseBucket(DEFAULT_BUCKET_OPEN_ANGLE, DEFAULT_BUCKET_OPEN_SPEED);
 }
 
 bool CraneController::CloseBucket()
 {
-	return OpenCloseBucket(CC_CLOSE_BUCKET);
+	return OpenCloseBucket(DEFAULT_BUCKET_CLOSED_ANGLE, DEFAULT_BUCKET_CLOSE_SPEED);
 }
 
-bool CraneController::OpenCloseBucket(CANDY_CRANE_COMMANDS openclose)
+bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed)
 {
-	_bucketMoveComplete = false;
-	if (!SendEspNowCommand(openclose))
-	{
-		return false;
-	}
+	_bucketOpenCloseComplete = false;
+
+	EspNowMessage message;
+	message.command = CC_MOVE_BUCKET;
+	message.angle = moveToAngle;
+	message.speed = moveingSpeed;
+	SendEspNowMessage(message);
 
 	unsigned long endWait = millis() + BUCKET_MOVE_WAIT_TIME;
 	while (millis() < endWait) {
-		portENTER_CRITICAL(&_muxBucketMotion);
-		bool state = _bucketMoveComplete;
-		portEXIT_CRITICAL(&_muxBucketMotion);
+		portENTER_CRITICAL(&_muxBucketOpenClose);
+		bool state = _bucketOpenCloseComplete;
+		portEXIT_CRITICAL(&_muxBucketOpenClose);
 
 		if (state)
 		{
 			return true;
 		}
-		delay(5);
+		vTaskDelay(5);
 	}
 	return false;
 }
@@ -102,13 +141,42 @@ bool CraneController::SendBucketHeartbeat()
 		if (_bucketHeartbeatsWaiting > BUCKET_HEARBEATS_MAX_MISSED) {
 			_bucketConnected = false;
 		}
-		bool ret = SendEspNowCommand(CC_PING);
+
+		SendEspNowCommand(CC_PING);
 		_bucketHeartbeatsWaiting++;
 		_nextHeartbeat = millis() + BUCKET_HEARTBEAT_INTERVAL;
-		return ret;
+		return true;
 	}
 	return false;
 }
+
+void CraneController::RecalibrateDolly()
+{
+	Serial.println("Recalibrating Dolly");
+	_dolly.Calibrate();
+}
+
+void CraneController::MoveDollyOutwards()
+{
+	_dolly.MoveDollyOutwards();
+}
+
+void CraneController::MoveDollyInwards()
+{
+	_dolly.MoveDollyInwards();
+}
+
+void CraneController::StopDolly()
+{
+	_dolly.StopDolly();
+}
+
+bool CraneController::IsDollyInMotion()
+{
+	return _dolly.IsDollyInMotion();
+}
+
+
 
 void CraneController::Run()
 {
@@ -120,17 +188,21 @@ void CraneController::Run()
 	//StartUp();
 	int counter = 0;
 	while (true) {
+		_dolly.Process();
+
 		/*
 		if (!_bucketConnected) {
 			// trigger general error condition
 			WaitforBucketConnect();
 		}
 		*/
+
+		/*
 		counter++;
 		GetBucketDistance();
 		Serial.printf("%i Bucket distance is: '%i'\n",counter, _bucketDistance);
-		delay(500);
-
+		vTaskDelay(500);
+		
 		if (_nextMove < millis())
 		{
 			if (_bucketState)
@@ -155,6 +227,7 @@ void CraneController::Run()
 			_bucketState = !_bucketState;
 			_nextMove = millis() + 5000;
 		}
+		*/
 	}
 }
 
@@ -171,22 +244,26 @@ void CraneController::RunQueueHandler()
 				break;
 			case CC_BUCKET_DISTANCE:
 				portENTER_CRITICAL(&_muxBucketDistance);
-				_bucketDistance = currentMessage.value;
+				_bucketDistance = currentMessage.distance;
 				portEXIT_CRITICAL(&_muxBucketDistance);
 				break;
 			case CC_BUCKET_MOVE_COMPLETE:
-				portENTER_CRITICAL(&_muxBucketMotion);
-				_bucketMoveComplete = true;
-				portEXIT_CRITICAL(&_muxBucketMotion);
+				portENTER_CRITICAL(&_muxBucketOpenClose);
+				_bucketOpenCloseComplete = true;
+				portEXIT_CRITICAL(&_muxBucketOpenClose);
 				break;
 			default:
 				Serial.print("Found an oddity in the queue!");
 				Serial.print(currentMessage.command);
-				Serial.print("  -  ");
-				Serial.println(currentMessage.value);
+				Serial.print("  -  Angle: ");
+				Serial.print(currentMessage.angle);
+				Serial.print("  -  Speed: ");
+				Serial.print(currentMessage.speed);
+				Serial.print("  -  Distance: ");
+				Serial.print(currentMessage.distance);
 				break;
 			}
 		}
-		delay(1);
+		vTaskDelay(1);
 	}
 }

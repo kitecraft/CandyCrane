@@ -5,7 +5,8 @@
 #include "EspNowMessage.h"
 #include "EspNowIncomingMessageQueue.h"
 
-static uint8_t broadcastAddress[] = { 0x3C, 0x71, 0xBF, 0x44, 0x7B, 0x68 };
+static uint8_t broadcastAddress[] = { 0x3C, 0x71, 0xBF, 0x44, 0x7B, 0x68 }; //CandyCrane
+//static uint8_t broadcastAddress[] = { 0x84, 0xCC, 0xA8, 0x83, 0xF1, 0xCA };  //CCComms
 extern EspNowIncomingMessageQueue g_espNowMessageQueue;
 
 static void OnDataSent(uint8_t* mac_addr, uint8_t sendStatus) {
@@ -22,7 +23,7 @@ static void OnDataRecv(uint8_t* mac, uint8_t* incomingData, uint8_t len) {
     EspNowMessage message;
     memcpy(&message, incomingData, sizeof(message));
     g_espNowMessageQueue.AddItemToQueue(message);
-    //Serial.println("Data Received");
+    Serial.println("Data Received");
 }
 
 constexpr char WIFI_SSID[] = "Starside";
@@ -54,16 +55,28 @@ static bool InitEspNow()
     esp_now_set_self_role(ESP_NOW_ROLE_COMBO);
     esp_now_register_send_cb(OnDataSent);
     esp_now_register_recv_cb(OnDataRecv);
-    esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_COMBO, 1, NULL, 0);
+    esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_COMBO, channel, NULL, 0);
 
     return true;
 }
 
-static void SendEspNowCommand(CANDY_CRANE_COMMANDS command, int valueToSend = -1)
+static void SendEspNowCommand(EspNowMessage espNowOutgoingMessage)
+{
+    esp_now_send(broadcastAddress, (uint8_t*)&espNowOutgoingMessage, sizeof(espNowOutgoingMessage));
+}
+
+static void SendEspNowDistance(int distance)
+{
+    EspNowMessage message;
+    message.command = CC_BUCKET_DISTANCE;
+    message.distance = distance;
+    esp_now_send(broadcastAddress, (uint8_t*)&message, sizeof(message));
+}
+
+static void SendEspNowCommand(CANDY_CRANE_COMMANDS command)
 {
     EspNowMessage espNowOutgoingMessage;
     espNowOutgoingMessage.command = command;
-    espNowOutgoingMessage.value = valueToSend;
 
     esp_now_send(broadcastAddress, (uint8_t*)&espNowOutgoingMessage, sizeof(espNowOutgoingMessage));
 }

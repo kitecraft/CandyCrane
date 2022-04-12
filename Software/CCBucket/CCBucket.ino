@@ -17,64 +17,71 @@ EspNowIncomingMessageQueue g_espNowMessageQueue;
 
 ServoEasing BucketServo;
 VL53L0X bucketRanger;
+bool g_bucketIsMoving = false;
 
 
 void setup() {
-    //Serial.begin(115200);
     Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
     Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
+
     Wire.begin(2, 0);
 
-    Serial.println("Starting ESPNow");
+    if (!bucketRanger.init())
+    {
+        Serial.println("Failed to detect and initialize sensor!  As such, I will now refuse to continue.");
+        //while (true) { delay(1); }
+    }
+    bucketRanger.setTimeout(500);
+    bucketRanger.setMeasurementTimingBudget(75000);
+    bucketRanger.setSignalRateLimit(0.50);
+    
+
+    if (BucketServo.attach(SERVO1_PIN, DEFAULT_BUCKET_OPEN_ANGLE) == INVALID_SERVO) {
+        Serial.println(F("Error attaching servo"));
+    }
+    MoveBucket(DEFAULT_BUCKET_OPEN_ANGLE, DEFAULT_BUCKET_OPEN_SPEED);
+
+
+    //Serial.println("Starting ESPNow");
     if (!InitEspNow())
     {
         Serial.println("\n\nFailed to start ESPNow stuff.  As such, I will now refuse to continue.");
         while (true) { delay(1); }
     }
-
-
-    bucketRanger.setTimeout(500);
-    if (!bucketRanger.init())
-    {
-        Serial.println("Failed to detect and initialize sensor!  As such, I will now refuse to continue.");
-        while (true) { delay(1); }
-    }
-
-    if (BucketServo.attach(SERVO1_PIN, BUCKET_CLOSED_ANGLE) == INVALID_SERVO) {
-        Serial.println(F("Error attaching servo"));
-    }
-
-
-    OpenBucket();
-    Serial.println("\n\n---\nStarting");
+    //Serial.println("\n\n---\nStarting");
 }
 
 void loop() {
     HandleEspNowData();
+    
+    if (g_bucketIsMoving)
+    {
+        if(!BucketServo.isMoving())
+        {
+            g_bucketIsMoving = false;
+            SendEspNowCommand(CC_BUCKET_MOVE_COMPLETE);
+        }
+    }
+    
 }
 
 void HandleEspNowData()
 {
     if (!g_espNowMessageQueue.IsQueueEmpty()) {
         EspNowMessage currMessage = g_espNowMessageQueue.GetNextItem();
+        //Serial.println("Handling ESP Now data");
+        //Serial.print("Command: '");
+        //Serial.print(currMessage.command);
+        //Serial.println("'");
         switch (currMessage.command) {
         case CC_PING:
             SendEspNowCommand(CC_PONG);
             break;
-        case CC_OPEN_BUCKET:
-            OpenBucket();
-            break;
-        case CC_CLOSE_BUCKET:
-            CloseBucket();
+        case CC_MOVE_BUCKET:
+            MoveBucket(currMessage.angle, currMessage.speed);
             break;
         case CC_GET_DISTANCE:
             SendSingleDistance();
-            break;
-        case CC_START_DISTANCE_STREAM:
-            SendEspNowAck();
-            break;
-        case CC_END_DISTANCE_STREAM:
-            SendEspNowAck();
             break;
         default:
             break;
@@ -87,30 +94,15 @@ void SendEspNowAck()
     SendEspNowCommand(CC_ACK_COMMAND);
 }
 
-void OpenBucket()
+void MoveBucket(uint16_t angle, uint16_t speed)
 {
-    BucketServo.easeTo(BUCKET_OPEN_ANGLE, BUCKET_OPEN_SPEED);
-    while (BucketServo.isMoving())
-    {
-        delay(2);
-    }
-    //delay(BUCKET_OPEN_WAIT_TIME);
-    SendEspNowCommand(CC_BUCKET_MOVE_COMPLETE);
-}
-
-void CloseBucket()
-{
-    BucketServo.easeTo(BUCKET_CLOSED_ANGLE, BUCKET_CLOSE_SPEED);
-    while (BucketServo.isMoving())
-    {
-        delay(2);
-    }
-    SendEspNowCommand(CC_BUCKET_MOVE_COMPLETE);
-}
+    BucketServo.easeTo(angle, speed);
+    g_bucketIsMoving = true;
+};
 
 void SendSingleDistance()
 {
-    uint32_t distance = bucketRanger.readRangeSingleMillimeters();
-    Serial.printf("Distance: '%i'\n", distance);
-    SendEspNowCommand(CC_BUCKET_DISTANCE, distance);
+    //uint32_t distance = bucketRanger.readRangeSingleMillimeters();
+    //Serial.printf("Distance: '%i'\n", distance);
+    SendEspNowDistance(bucketRanger.readRangeSingleMillimeters());
 }

@@ -3,9 +3,9 @@
 #include <WiFi.h>
 #include <esp_now.h>
 #include "EspNowMessage.h"
-#include "EspNowIncomingMessageQueue.h"
+#include "EspNowMessageQueue.h"
 
-extern EspNowIncomingMessageQueue g_espNowMessageQueue;
+extern EspNowMessageQueue g_espNowMessageQueue;
 static uint8_t broadcastAddress[] = { 0x84, 0xCC, 0xA8, 0x83, 0xD0, 0x92 };
 
 // callback when data is sent
@@ -33,7 +33,7 @@ static bool InitEspNow()
     esp_now_register_recv_cb(OnDataRecv);
     esp_now_peer_info_t peerInfo;
     memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-    peerInfo.channel = 1;
+    //peerInfo.channel = 1;
     peerInfo.encrypt = false;
     if (esp_now_add_peer(&peerInfo) != ESP_OK) {
         Serial.println("Failed to add peer");
@@ -42,11 +42,21 @@ static bool InitEspNow()
     return true;
 }
 
-static bool SendEspNowCommand(CANDY_CRANE_COMMANDS command, int valueToSend = -1)
+static bool SendEspNowMessage(EspNowMessage espNowOutgoingMessage)
+{
+    esp_err_t result = esp_now_send(broadcastAddress, (uint8_t*)&espNowOutgoingMessage, sizeof(espNowOutgoingMessage));
+    if (result != ESP_OK) {
+        Serial.println("Failed to send message.");
+        return false;
+    }
+
+    return true;
+}
+
+static bool SendEspNowCommand(CANDY_CRANE_COMMANDS command)
 {
     EspNowMessage espNowOutgoingMessage;
     espNowOutgoingMessage.command = command;
-    espNowOutgoingMessage.value = valueToSend;
     esp_err_t result = esp_now_send(broadcastAddress, (uint8_t*)&espNowOutgoingMessage, sizeof(espNowOutgoingMessage));
     if (result != ESP_OK) {
         Serial.println("Failed to send message.");
