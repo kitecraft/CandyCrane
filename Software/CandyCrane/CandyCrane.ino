@@ -113,10 +113,13 @@ void HandleButtonPress()
             g_craneController.MoveDollyInwards();
             break;
         case btn_Bucket_Up:
+            g_craneController.MoveBucketUpwards();
             break;
         case btn_Bucket_StopHome:
+            g_craneController.StopBucketMotion();
             break;
         case btn_Bucket_Down:
+            g_craneController.MoveBucketDownwards();
             break;
         case btn_Bucket_Open:
             break;

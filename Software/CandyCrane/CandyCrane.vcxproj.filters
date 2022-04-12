@@ -61,7 +61,7 @@
     <ClInclude Include="src\Crane\DollyStepper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RopeBarrel.h">
+    <ClInclude Include="src\Crane\RopeBarrellStepper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -78,7 +78,7 @@
     <ClCompile Include="src\Crane\DollyStepper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RopeBarrel.cpp">
+    <ClCompile Include="src\Crane\RopeBarrellStepper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

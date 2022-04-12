@@ -6,11 +6,7 @@ void CraneController::StartUp()
 	_muxBucketOpenClose = portMUX_INITIALIZER_UNLOCKED;
 
 	_dolly.Init();
-
-	_ropeBarrelStepper = new CheapStepper(ROPE_BARREL_STEPPER_PIN_1, ROPE_BARREL_STEPPER_PIN_2, ROPE_BARREL_STEPPER_PIN_3, ROPE_BARREL_STEPPER_PIN_4);
-	//_ropeBarrelStepper.connectToPins(ROPE_BARREL_STEPPER_PIN_1, ROPE_BARREL_STEPPER_PIN_2, ROPE_BARREL_STEPPER_PIN_3, ROPE_BARREL_STEPPER_PIN_4);
-	//_ropeBarrelStepper.setSpeedInStepsPerSecond(ROPE_BARREL_STEPPER_SPEED);
-	//_ropeBarrelStepper.setAccelerationInStepsPerSecondPerSecond(ROPE_BARREL_STEPPER_ACCEL);
+	_ropebarrel.Init();
 	
 	CalibrateAll();
 }
@@ -176,6 +172,20 @@ bool CraneController::IsDollyInMotion()
 	return _dolly.IsDollyInMotion();
 }
 
+void CraneController::MoveBucketDownwards()
+{
+	_ropebarrel.DropBucket();
+}
+
+void CraneController::MoveBucketUpwards()
+{
+	_ropebarrel.RaiseBucket();
+}
+
+void CraneController::StopBucketMotion()
+{
+	_ropebarrel.StopBucket();
+}
 
 
 void CraneController::Run()
@@ -189,6 +199,7 @@ void CraneController::Run()
 	int counter = 0;
 	while (true) {
 		_dolly.Process();
+		_ropebarrel.Process();
 
 		/*
 		if (!_bucketConnected) {

@@ -5,7 +5,8 @@
 #include "../ESPNow/EspNowMessage.h"
 #include "../ESPNow/EspNowManager.h"
 #include "DollyStepper.h"
-#include <CheapStepper.h>
+#include "RopeBarrellStepper.h"
+
 
 extern EspNowMessageQueue g_espNowMessageQueue;
 
@@ -29,8 +30,7 @@ private:
 	bool OpenCloseBucket(int moveToAngle, int moveSpeed);
 	bool SendBucketHeartbeat();
 
-	//CheapStepper *_dollyStepper;
-	CheapStepper *_ropeBarrelStepper;
+	RopeBarrellStepper _ropebarrel;
 	DollyStepper _dolly;
 
 
@@ -47,11 +47,14 @@ public:
 	void Run();
 	void RunQueueHandler();
 
-
 	void MoveDollyOutwards();
 	void MoveDollyInwards();
 	void StopDolly();
 	bool IsDollyInMotion();
 	void RecalibrateDolly();
+
+	void MoveBucketDownwards();
+	void MoveBucketUpwards();
+	void StopBucketMotion();
 };
 

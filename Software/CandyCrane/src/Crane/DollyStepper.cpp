@@ -21,10 +21,15 @@ bool DollyStepper::Calibrate()
 	Serial.println("Calibrating the Dolly");
 	if (IsDollyLimitSwitchActive())
 	{
-		_stepper->moveCW(DollyStepsForDistance(10));
+		_stepper->newMoveCW(DollyStepsForDistance(10));
+		while (_stepper->getStepsLeft() > 0)
+		{
+			_stepper->run();
+			vTaskDelay(1);
+		}
 		if (IsDollyLimitSwitchActive())
 		{
-			Serial.println("Calibration fail 1:  The limit switch is still active");
+			Serial.println("Dolly: Calibration fail 1:  The limit switch is still active");
 			return false;
 		}
 	}
@@ -66,20 +71,20 @@ bool DollyStepper::IsDollyInMotion()
 void DollyStepper::MoveDollyOutwards()
 {
 	if (_errorCondition) {
-		Serial.println("Error condition exists.  Unable to move dolly.");
+		Serial.println("Dolly: Error condition exists.  Unable to move dolly.");
 		return;
 	}
-	Serial.printf("Current step  '%i' \n", _stepper->getStep());
+	Serial.printf("Dolly: Current step  '%i' \n", _stepper->getStep());
 	int val = _dollyMaxiumSteps - _stepper->getStep();
 	Serial.printf("Moving Dolly Outwards '%i' steps\n", val);
-	_stepper->newMoveCW(_dollyMaxiumSteps - _stepper->getStep());
+	_stepper->newMoveCW(val);
 	SetDollyMotionStatus(true);
 }
 
 void DollyStepper::MoveDollyInwards()
 {
 	if (_errorCondition) {
-		Serial.println("Error condition exists.  Unable to move dolly.");
+		Serial.println("Dolly: Error condition exists.  Unable to move dolly.");
 		return;
 	}
 	Serial.println("Moveing Dolly Inwards");
@@ -99,20 +104,20 @@ void DollyStepper::Process()
 	{
 		if (_errorCondition)
 		{
-			Serial.println("Error condition exists.  Unable to move dolly.");
+			Serial.println("Dolly: Error condition exists.  Unable to move dolly.");
 			_stepper->stop();
+			SetDollyMotionStatus(false);
 			return;
 		}
 
 		if (_stepper->getStepsLeft() != 0)
 		{
-			int currPostion = _stepper->getStep();
-			if (!IsDollyLimitSwitchActive() && currPostion < _dollyMaxiumSteps + 1)
+			if (!IsDollyLimitSwitchActive() && (_stepper->getStep() < _dollyMaxiumSteps + 1))
 			{
 				_stepper->run();
 			}
 			else {
-				Serial.println("Ending run due to a limit being hit");
+				Serial.println("Dolly: Ending run due to a limit being hit");
 				_stepper->stop();
 				SetDollyMotionStatus(false);
 				_errorCondition = true;
@@ -120,7 +125,7 @@ void DollyStepper::Process()
 
 		}
 		else {
-			Serial.println("Move complete.");
+			Serial.println("Dolly Move complete.");
 			SetDollyMotionStatus(false);
 		}
 	}
