@@ -6,6 +6,7 @@
 #include "../ESPNow/EspNowManager.h"
 #include "DollyStepper.h"
 #include "RopeBarrellStepper.h"
+#include "TowerStepper.h"
 
 
 extern EspNowMessageQueue g_espNowMessageQueue;
@@ -32,6 +33,7 @@ private:
 
 	RopeBarrellStepper _ropebarrel;
 	DollyStepper _dolly;
+	TowerStepper _tower;
 
 
 	bool CalibrateBucket();
@@ -56,5 +58,9 @@ public:
 	void MoveBucketDownwards();
 	void MoveBucketUpwards();
 	void StopBucketMotion();
+
+	void MoveTowerOutwards();
+	void MoveTowerInwards();
+	void StopTowerMotion();
 };
 

@@ -119,6 +119,7 @@
     <ClInclude Include="src\Crane\CraneController.h" />
     <ClInclude Include="src\Crane\DollyStepper.h" />
     <ClInclude Include="src\Crane\RopeBarrellStepper.h" />
+    <ClInclude Include="src\Crane\TowerStepper.h" />
     <ClInclude Include="src\ESPNow\CandyCraneCommands.h" />
     <ClInclude Include="src\ESPNow\EspNowManager.h" />
     <ClInclude Include="src\ESPNow\EspNowMessage.h" />
@@ -134,6 +135,7 @@
     <ClCompile Include="src\Crane\CraneController.cpp" />
     <ClCompile Include="src\Crane\DollyStepper.cpp" />
     <ClCompile Include="src\Crane\RopeBarrellStepper.cpp" />
+    <ClCompile Include="src\Crane\TowerStepper.cpp" />
     <ClCompile Include="src\ESPNow\EspNowMessageQueue.cpp" />
     <ClCompile Include="src\Utilities\ButtonManager.cpp" />
   </ItemGroup>

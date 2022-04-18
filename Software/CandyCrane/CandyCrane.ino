@@ -39,6 +39,7 @@ void setup() {
 
     g_buttonManager.Init(MCP_BUTTON_CONTROLLER_ADDRESS, MCP_BUTTON_CONTROLLER_INTERUPT_PIN);
 
+
     Serial.println("Beginning EspNow connection");
     if (!InitEspNow())
     {
@@ -96,10 +97,13 @@ void HandleButtonPress()
         case btn_Emergency_StopHome:
             break;
         case btn_Tower_Forward:
+            g_craneController.MoveTowerOutwards();
             break;
         case btn_Tower_StopHome:
+            g_craneController.StopTowerMotion();
             break;
         case btn_Tower_Backward:
+            g_craneController.MoveTowerInwards();
             break;
         case btn_Dolly_Outwards:
             g_craneController.MoveDollyOutwards();

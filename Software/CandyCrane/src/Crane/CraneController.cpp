@@ -7,6 +7,7 @@ void CraneController::StartUp()
 
 	_dolly.Init();
 	_ropebarrel.Init();
+	_tower.Init();
 	
 	CalibrateAll();
 }
@@ -42,10 +43,11 @@ bool CraneController::CalibrateAll()
 	//	return false;
 	//}
 
-	if (!_dolly.Calibrate())
-	{
-		return false;
-	}
+
+	//if (!_dolly.Calibrate())
+	//{
+	//	return false;
+	//}
 
 	if (!CalibrateTower())
 	{
@@ -187,6 +189,21 @@ void CraneController::StopBucketMotion()
 	_ropebarrel.StopBucket();
 }
 
+void CraneController::MoveTowerOutwards()
+{
+	_tower.MoveTowerOutwards();
+}
+
+void CraneController::MoveTowerInwards()
+{
+	_tower.MoveTowerInwards();
+}
+
+void CraneController::StopTowerMotion()
+{
+	_tower.StopTower();
+}
+
 
 void CraneController::Run()
 {
@@ -200,6 +217,7 @@ void CraneController::Run()
 	while (true) {
 		_dolly.Process();
 		_ropebarrel.Process();
+		_tower.Process();
 
 		/*
 		if (!_bucketConnected) {
