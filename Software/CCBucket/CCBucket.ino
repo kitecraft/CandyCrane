@@ -25,7 +25,7 @@ void setup() {
     Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
 
     Wire.begin(2, 0);
-
+    
     if (!bucketRanger.init())
     {
         Serial.println("Failed to detect and initialize sensor!  As such, I will now refuse to continue.");
@@ -35,12 +35,13 @@ void setup() {
     bucketRanger.setMeasurementTimingBudget(75000);
     bucketRanger.setSignalRateLimit(0.50);
     
-
+    
     if (BucketServo.attach(SERVO1_PIN, DEFAULT_BUCKET_OPEN_ANGLE) == INVALID_SERVO) {
         Serial.println(F("Error attaching servo"));
     }
-    MoveBucket(DEFAULT_BUCKET_OPEN_ANGLE, DEFAULT_BUCKET_OPEN_SPEED);
-
+    
+    //MoveBucket(DEFAULT_BUCKET_OPEN_ANGLE, DEFAULT_BUCKET_OPEN_SPEED);
+    
 
     //Serial.println("Starting ESPNow");
     if (!InitEspNow())
@@ -94,7 +95,7 @@ void SendEspNowAck()
     SendEspNowCommand(CC_ACK_COMMAND);
 }
 
-void MoveBucket(uint16_t angle, uint16_t speed)
+void MoveBucket(int angle, int speed)
 {
     BucketServo.easeTo(angle, speed);
     g_bucketIsMoving = true;

@@ -4,9 +4,9 @@
 
 typedef struct EspNowMessage {
     int command = CC_NONE;
-    uint16_t distance = -1;
-    uint16_t angle = -1;
-    uint16_t speed = -1;
+    int distance = -1;
+    int angle = -1;
+    int speed = -1;
 
     EspNowMessage() {}
     EspNowMessage(CANDY_CRANE_COMMANDS newCommand) {

@@ -126,8 +126,12 @@ void HandleButtonPress()
             g_craneController.MoveBucketDownwards();
             break;
         case btn_Bucket_Open:
+            Serial.println("Opening");
+            g_craneController.OpenBucket();
             break;
         case btn_Bucket_Close:
+            Serial.println("Closing");
+            g_craneController.CloseBucket();
             break;
 
         }

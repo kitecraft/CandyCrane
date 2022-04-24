@@ -5,9 +5,9 @@ void CraneController::StartUp()
 	_muxBucketDistance = portMUX_INITIALIZER_UNLOCKED;
 	_muxBucketOpenClose = portMUX_INITIALIZER_UNLOCKED;
 
-	_dolly.Init();
-	_ropebarrel.Init();
-	_tower.Init();
+	//_dolly.Init();
+	//_ropebarrel.Init();
+	//_tower.Init();
 	
 	CalibrateAll();
 }
@@ -38,10 +38,10 @@ bool CraneController::CalibrateTower()
 
 bool CraneController::CalibrateAll()
 {
-	//if (!CalibrateBucket())
-	//{
-	//	return false;
-	//}
+	if (!CalibrateBucket())
+	{
+		return false;
+	}
 
 
 	//if (!_dolly.Calibrate())
@@ -49,10 +49,10 @@ bool CraneController::CalibrateAll()
 	//	return false;
 	//}
 
-	if (!CalibrateTower())
-	{
-		return false;
-	}
+	//if (!CalibrateTower())
+	//{
+	//	return false;
+	//}
 
 	return true;
 }
@@ -99,17 +99,20 @@ bool CraneController::GetBucketDistance()
 
 bool CraneController::OpenBucket()
 {
+	Serial.printf("Open to: '%i'\n", DEFAULT_BUCKET_OPEN_ANGLE);
 	return OpenCloseBucket(DEFAULT_BUCKET_OPEN_ANGLE, DEFAULT_BUCKET_OPEN_SPEED);
 }
 
 bool CraneController::CloseBucket()
 {
+	Serial.printf("Close to: '%i'\n", DEFAULT_BUCKET_CLOSED_ANGLE);
 	return OpenCloseBucket(DEFAULT_BUCKET_CLOSED_ANGLE, DEFAULT_BUCKET_CLOSE_SPEED);
 }
 
 bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed)
 {
 	_bucketOpenCloseComplete = false;
+	Serial.println("Open/Close bucket");
 
 	EspNowMessage message;
 	message.command = CC_MOVE_BUCKET;
@@ -125,10 +128,12 @@ bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed)
 
 		if (state)
 		{
+			Serial.println("Bucket move complete");
 			return true;
 		}
 		vTaskDelay(5);
 	}
+	Serial.println("Bucket move failed");
 	return false;
 }
 
@@ -215,9 +220,19 @@ void CraneController::Run()
 	//StartUp();
 	int counter = 0;
 	while (true) {
+
+		//GetBucketDistance();
+		//Serial.printf("%i Bucket distance is: '%i'\n", counter, _bucketDistance);
+		//vTaskDelay(1000);
+
+		/*
 		_dolly.Process();
 		_ropebarrel.Process();
 		_tower.Process();
+		*/
+		
+
+
 
 		/*
 		if (!_bucketConnected) {
@@ -257,6 +272,7 @@ void CraneController::Run()
 			_nextMove = millis() + 5000;
 		}
 		*/
+		vTaskDelay(1);
 	}
 }
 

@@ -26,8 +26,6 @@ private:
 
 	bool WaitforBucketConnect();
 	bool GetBucketDistance();
-	bool OpenBucket();
-	bool CloseBucket();
 	bool OpenCloseBucket(int moveToAngle, int moveSpeed);
 	bool SendBucketHeartbeat();
 
@@ -62,5 +60,8 @@ public:
 	void MoveTowerOutwards();
 	void MoveTowerInwards();
 	void StopTowerMotion();
+
+	bool OpenBucket();
+	bool CloseBucket();
 };
 
