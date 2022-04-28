@@ -7,7 +7,7 @@ void CraneController::StartUp()
 
 	//_dolly.Init();
 	//_ropebarrel.Init();
-	//_tower.Init();
+	_tower.Init();
 	
 	CalibrateAll();
 }
@@ -38,10 +38,10 @@ bool CraneController::CalibrateTower()
 
 bool CraneController::CalibrateAll()
 {
-	if (!CalibrateBucket())
-	{
-		return false;
-	}
+	//if (!CalibrateBucket())
+	//{
+	//	return false;
+	//}
 
 
 	//if (!_dolly.Calibrate())
@@ -220,6 +220,7 @@ void CraneController::Run()
 	//StartUp();
 	int counter = 0;
 	while (true) {
+		_tower.Process();
 
 		//GetBucketDistance();
 		//Serial.printf("%i Bucket distance is: '%i'\n", counter, _bucketDistance);

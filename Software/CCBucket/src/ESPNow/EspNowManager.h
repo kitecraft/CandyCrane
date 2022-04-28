@@ -5,7 +5,8 @@
 #include "EspNowMessage.h"
 #include "EspNowIncomingMessageQueue.h"
 
-static uint8_t broadcastAddress[] = { 0x3C, 0x71, 0xBF, 0x44, 0x7B, 0x68 }; //CandyCrane
+static uint8_t broadcastAddress[] = { 0xB4, 0xE6, 0x2D, 0xBF, 0xA8, 0xE1 };
+//static uint8_t broadcastAddress[] = { 0x3C, 0x71, 0xBF, 0x44, 0x7B, 0x68 }; //CandyCrane ESP32s
 //static uint8_t broadcastAddress[] = { 0x84, 0xCC, 0xA8, 0x83, 0xF1, 0xCA };  //CCComms
 extern EspNowIncomingMessageQueue g_espNowMessageQueue;
 

@@ -34,18 +34,16 @@ void TowerStepper::Process()
 
 		if (_stepper->getStepsLeft() != 0)
 		{
-			/*
-			if (_stepper->getStep() < _ropeBarrelMaxiumSteps + 1)
+			if (_stepper->getStep() < _towerMaxiumSteps + 1)
 			{
 				_stepper->run();
 			}
 			else {
 				Serial.println("TowerStepper: Bucket: Ending run due to a limit being hit");
 				_stepper->stop();
-				SetBucketMotionStatus(false);
+				SetTowerMotionStatus(false);
 				_errorCondition = true;
 			}
-			*/
 			_stepper->run();
 		}
 		else {
