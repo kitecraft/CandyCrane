@@ -32,14 +32,14 @@ void IRAM_ATTR CraneControllerQueueThread(void*)
 
 bool setupComplete = true;
 void setup() {
-    Serial.begin(57600);
+    Serial.begin(115200);
     Wire.begin(21, 22);
     
     Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
 
     g_buttonManager.Init(MCP_BUTTON_CONTROLLER_ADDRESS, MCP_BUTTON_CONTROLLER_INTERUPT_PIN);
 
-
+    
     Serial.println("Beginning EspNow connection");
     if (!InitEspNow())
     {
@@ -65,14 +65,13 @@ void setup() {
         CRANE_CONTROL_CORE);
         
     Serial.println("\n\n---\nBeginning Run mode.");
+    
 }
 
 
 void loop() {
     
     HandleButtonPress();
-
-    delay(1);
 }
 
 void StopAll()
@@ -126,11 +125,11 @@ void HandleButtonPress()
             g_craneController.MoveBucketDownwards();
             break;
         case btn_Bucket_Open:
-            Serial.println("Opening");
+            Serial.println("Opening Bucket");
             g_craneController.OpenBucket();
             break;
         case btn_Bucket_Close:
-            Serial.println("Closing");
+            Serial.println("Closing Closing");
             g_craneController.CloseBucket();
             break;
 

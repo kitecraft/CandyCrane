@@ -10,7 +10,7 @@ bool RopeBarrellStepper::Init()
 	_muxBucketMotion = portMUX_INITIALIZER_UNLOCKED;
 	_ropeBarrelMaxiumSteps = RopeBarrelStepsForDistance(ROPE_BARREL_MAXIMUM_DISTANCE);
 	_stepper = new CheapStepper(ROPE_BARREL_STEPPER_PIN_1, ROPE_BARREL_STEPPER_PIN_2, ROPE_BARREL_STEPPER_PIN_3, ROPE_BARREL_STEPPER_PIN_4);
-	_stepper->setRpm(14);
+	//_stepper->setRpm(14);
 	return true;
 }
 

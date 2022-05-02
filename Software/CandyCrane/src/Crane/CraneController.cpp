@@ -5,9 +5,9 @@ void CraneController::StartUp()
 	_muxBucketDistance = portMUX_INITIALIZER_UNLOCKED;
 	_muxBucketOpenClose = portMUX_INITIALIZER_UNLOCKED;
 
-	//_dolly.Init();
-	//_ropebarrel.Init();
+	_dolly.Init();
 	_tower.Init();
+	_ropebarrel.Init();
 	
 	CalibrateAll();
 }
@@ -17,6 +17,7 @@ bool CraneController::CalibrateBucket()
 	while (!_bucketConnected) {
 		WaitforBucketConnect();
 	}
+
 	CloseBucket();
 	if (!GetBucketDistance())
 	{
@@ -220,17 +221,17 @@ void CraneController::Run()
 	//StartUp();
 	int counter = 0;
 	while (true) {
-		_tower.Process();
+		
 
 		//GetBucketDistance();
 		//Serial.printf("%i Bucket distance is: '%i'\n", counter, _bucketDistance);
 		//vTaskDelay(1000);
 
-		/*
+		
 		_dolly.Process();
 		_ropebarrel.Process();
 		_tower.Process();
-		*/
+		
 		
 
 
