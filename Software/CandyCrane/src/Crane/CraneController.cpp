@@ -1,15 +1,20 @@
 #include "CraneController.h"
 
-void CraneController::StartUp()
+bool CraneController::StartUp()
 {
 	_muxBucketDistance = portMUX_INITIALIZER_UNLOCKED;
 	_muxBucketOpenClose = portMUX_INITIALIZER_UNLOCKED;
 
-	_dolly.Init();
-	_tower.Init();
-	_ropebarrel.Init();
+	//_dolly.Init();
+	//_tower.Init();
+	//_ropebarrel.Init();
 	
-	CalibrateAll();
+	if (!CalibrateAll())
+	{
+		Serial.println("CraneController::StartUp() - Failed to calibrate");
+		return false;
+	}
+	return true;
 }
 
 bool CraneController::CalibrateBucket()
@@ -80,7 +85,7 @@ bool CraneController::WaitforBucketConnect()
 
 bool CraneController::GetBucketDistance()
 {
-	SendEspNowCommand(CC_GET_DISTANCE);
+	SendCommand(CC_GET_DISTANCE);
 
 	// wait for distance to be updated
 	unsigned long endWait = millis() + BUCKET_COMMAND_WAIT_TIME;
@@ -119,7 +124,7 @@ bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed)
 	message.command = CC_MOVE_BUCKET;
 	message.angle = moveToAngle;
 	message.speed = moveingSpeed;
-	SendEspNowMessage(message);
+	SendMessage(message);
 
 	unsigned long endWait = millis() + BUCKET_MOVE_WAIT_TIME;
 	while (millis() < endWait) {
@@ -145,8 +150,7 @@ bool CraneController::SendBucketHeartbeat()
 		if (_bucketHeartbeatsWaiting > BUCKET_HEARBEATS_MAX_MISSED) {
 			_bucketConnected = false;
 		}
-
-		SendEspNowCommand(CC_PING);
+		SendCommand(CC_PING);
 		_bucketHeartbeatsWaiting++;
 		_nextHeartbeat = millis() + BUCKET_HEARTBEAT_INTERVAL;
 		return true;
@@ -228,14 +232,11 @@ void CraneController::Run()
 		//vTaskDelay(1000);
 
 		
-		_dolly.Process();
-		_ropebarrel.Process();
-		_tower.Process();
+		//_dolly.Process();
+		//_ropebarrel.Process();
+		//_tower.Process();
 		
 		
-
-
-
 		/*
 		if (!_bucketConnected) {
 			// trigger general error condition
@@ -245,14 +246,14 @@ void CraneController::Run()
 
 		/*
 		counter++;
-		GetBucketDistance();
-		Serial.printf("%i Bucket distance is: '%i'\n",counter, _bucketDistance);
-		vTaskDelay(500);
 		
 		if (_nextMove < millis())
 		{
 			if (_bucketState)
 			{
+				GetBucketDistance();
+				Serial.printf("%i Bucket distance is: '%i'\n", counter, _bucketDistance);
+
 				Serial.println("Closing the bucket, dear Liza, dear Liza");
 				if (CloseBucket()) {
 					Serial.println("Bucket has been closed");
@@ -282,8 +283,8 @@ void CraneController::RunQueueHandler()
 {
 	_QueueHandlerRunning = true;
 	while (true) {
-		if (!g_espNowMessageQueue.IsQueueEmpty()) {
-			EspNowMessage currentMessage = g_espNowMessageQueue.GetNextItem();
+		if (!g_incomeingMessageQueue.IsQueueEmpty()) {
+			EspNowMessage currentMessage = g_incomeingMessageQueue.GetNextItem();
 			switch (currentMessage.command) {
 			case CC_PONG:
 				_bucketConnected = true;

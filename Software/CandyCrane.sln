@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CandyCrane", "CandyCrane\Ca
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CCBucket", "CCBucket\CCBucket.vcxproj", "{3AB20DF2-8090-42A4-8F20-A82EAA975323}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CCComms", "CCComms\CCComms.vcxproj", "{4E4538C5-E864-4D83-B53D-35B25FDBCA5A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CandyComms", "CandyComms\CandyComms.vcxproj", "{A1C1AA5B-D6A8-48DA-AE9C-04E35DE050A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{3AB20DF2-8090-42A4-8F20-A82EAA975323}.Debug|x86.Build.0 = Debug|Win32
 		{3AB20DF2-8090-42A4-8F20-A82EAA975323}.Release|x86.ActiveCfg = Release|Win32
 		{3AB20DF2-8090-42A4-8F20-A82EAA975323}.Release|x86.Build.0 = Release|Win32
-		{4E4538C5-E864-4D83-B53D-35B25FDBCA5A}.Debug|x86.ActiveCfg = Debug|Win32
-		{4E4538C5-E864-4D83-B53D-35B25FDBCA5A}.Debug|x86.Build.0 = Debug|Win32
-		{4E4538C5-E864-4D83-B53D-35B25FDBCA5A}.Release|x86.ActiveCfg = Release|Win32
-		{4E4538C5-E864-4D83-B53D-35B25FDBCA5A}.Release|x86.Build.0 = Release|Win32
+		{A1C1AA5B-D6A8-48DA-AE9C-04E35DE050A4}.Debug|x86.ActiveCfg = Debug|Win32
+		{A1C1AA5B-D6A8-48DA-AE9C-04E35DE050A4}.Debug|x86.Build.0 = Debug|Win32
+		{A1C1AA5B-D6A8-48DA-AE9C-04E35DE050A4}.Release|x86.ActiveCfg = Release|Win32
+		{A1C1AA5B-D6A8-48DA-AE9C-04E35DE050A4}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

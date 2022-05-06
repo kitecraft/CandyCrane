@@ -3,20 +3,25 @@
  Created:	3/26/2022 12:17:55 PM
  Author:	Kitecraft
 */
+#include <ArduinoQueue.h>
 #include <EEPROM.h>
 #include <Arduino.h>
-#include <WiFi.h>
+#include "src/Utilities/Network.h"
+#include "src/Utilities/CCWebServer.h"
 #include "src/CC_Config.h"
 #include "src/Crane/CraneController.h"
-#include "src/ESPNow/EspNowMessageQueue.h"
-#include "src/ESPNow/EspNowManager.h"
-#include "src/Utilities/ButtonManager.h"
-#include "src/Utilities/ButtonMap.h"
+#include "src/Utilities/IncomeingMessageQueue.h"
+#include "src/Utilities/OTAHandler.h"
 
-EspNowMessageQueue g_espNowMessageQueue;
+
+bool g_otaRunning = false;
+
+IncomeingMessageQueue g_incomeingMessageQueue;
 CraneController g_craneController;
+
 TaskHandle_t g_CraneControllerHandle = nullptr;
-ButtonManager g_buttonManager;
+TaskHandle_t g_webServerHandle = nullptr;
+TaskHandle_t g_OTAHandle = nullptr;
 
 void IRAM_ATTR CraneControllerThread(void*)
 {
@@ -28,50 +33,52 @@ void IRAM_ATTR CraneControllerQueueThread(void*)
     g_craneController.RunQueueHandler();
 }
 
-
-
 bool setupComplete = true;
 void setup() {
     Serial.begin(115200);
-    Wire.begin(21, 22);
-    
+    Serial2.begin(115200);
     Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
 
-    g_buttonManager.Init(MCP_BUTTON_CONTROLLER_ADDRESS, MCP_BUTTON_CONTROLLER_INTERUPT_PIN);
+    StartNetworkStuff();
 
-    
-    Serial.println("Beginning EspNow connection");
-    if (!InitEspNow())
+    Serial.println("Starting the crane");
+    xTaskCreatePinnedToCore(CraneControllerQueueThread,
+        "Crane Queue Loop",
+        STACK_SIZE, nullptr,
+        CRANE_CONTROL_QUEUE_HANDLER_PRIORITY,
+        &g_CraneControllerQueueHandle,
+        CRANE_CONTROL_QUEUE_HANDLER_CORE);
+
+    if (!g_craneController.StartUp())
     {
-        Serial.println("Failed to setup EspNow.  As such, I will now refuse to continue.");
+        Serial.println("Failed to start crane controller.  As such, I will now refuse to continue.");
         while (true) { delay(1); }
     }
 
-    Serial.println("Starting the crane");
-    xTaskCreatePinnedToCore(CraneControllerQueueThread, 
-        "Crane Queue Loop", 
-        STACK_SIZE, nullptr, 
-        CRANE_CONTROL_QUEUE_HANDLER_PRIORITY, 
-        &g_CraneControllerQueueHandle, 
-        CRANE_CONTROL_QUEUE_HANDLER_CORE);
-
-    
-    g_craneController.StartUp();
     xTaskCreatePinnedToCore(CraneControllerThread, 
         "Crane Control Loop", 
         STACK_SIZE, nullptr, 
         CRANE_CONTROL_PRIORITY, 
         &g_CraneControllerHandle, 
         CRANE_CONTROL_CORE);
-        
+      
     Serial.println("\n\n---\nBeginning Run mode.");
-    
 }
 
 
 void loop() {
-    
-    HandleButtonPress();
+    HandleInput();
+}
+
+void HandleInput()
+{
+    if (Serial2.available()) {
+        String line = Serial2.readStringUntil('\n');
+        Serial.print("Got line: '");
+        Serial.print(line);
+        Serial.println("'");
+        g_incomeingMessageQueue.AddItemToQueue(EspNowMessageFromCsvString(line));
+    }
 }
 
 void StopAll()
@@ -84,7 +91,23 @@ void StopAllAndHome()
 
 }
 
+void StartNetworkStuff()
+{
+    if (!connectToNetwork())
+    {
+        startLocalNetwork();
+        Serial.println("NOT starting OTA handler");
+    }
+    else {
+        Serial.println("Starting OTA Handler");
+        xTaskCreatePinnedToCore(OTAThread, "OTA Loop", STACK_SIZE, nullptr, OTA_PRIORITY, &g_OTAHandle, OTA_CORE);
+    }
 
+    Serial.println("Starting Webserver");
+    xTaskCreatePinnedToCore(WebSeverThread, "WebServer Loop", STACK_SIZE, nullptr, WEB_SERVER_PRIORITY, &g_webServerHandle, WEBSERVER_CORE);
+}
+
+/*
 void HandleButtonPress()
 {
     int button = g_buttonManager.HandleButtonInterrupt();
@@ -136,3 +159,4 @@ void HandleButtonPress()
         }
     }
 }
+*/

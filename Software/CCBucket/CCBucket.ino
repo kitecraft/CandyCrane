@@ -3,7 +3,6 @@
  Created:	3/26/2022 12:18:42 PM
  Author:	Kitecraft
 */
-#include <ESP8266WiFi.h>
 #include <espnow.h>
 #include "src/CB_Config.h"
 #include "src/ESPNow/CandyCraneCommands.h"
@@ -22,21 +21,20 @@ bool g_bucketIsMoving = false;
 
 void setup() {
     Serial.begin(115200, SERIAL_8N1, SERIAL_TX_ONLY);
-    Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
+    //Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
 
     Wire.begin(2, 0);
-    
+
     if (!bucketRanger.init())
     {
         Serial.println("Failed to detect and initialize sensor!  As such, I will now refuse to continue.");
-        //while (true) { delay(1); }
+        while (true) { delay(1); }
     }
     bucketRanger.setTimeout(500);
     bucketRanger.setMeasurementTimingBudget(75000);
     bucketRanger.setSignalRateLimit(0.50);
     
-    
-    if (BucketServo.attach(SERVO1_PIN, DEFAULT_BUCKET_OPEN_ANGLE) == INVALID_SERVO) {
+    if (BucketServo.attach(SERVO1_PIN, DEFAULT_BUCKET_START_ANGLE) == INVALID_SERVO) {
         Serial.println(F("Error attaching servo"));
     }
     
@@ -49,6 +47,7 @@ void setup() {
         Serial.println("\n\nFailed to start ESPNow stuff.  As such, I will now refuse to continue.");
         while (true) { delay(1); }
     }
+
     //Serial.println("\n\n---\nStarting");
 }
 
@@ -63,7 +62,6 @@ void loop() {
             SendEspNowCommand(CC_BUCKET_MOVE_COMPLETE);
         }
     }
-    
 }
 
 void HandleEspNowData()
@@ -79,9 +77,11 @@ void HandleEspNowData()
             SendEspNowCommand(CC_PONG);
             break;
         case CC_MOVE_BUCKET:
+            //Serial.println("Moving bucket");
             MoveBucket(currMessage.angle, currMessage.speed);
             break;
         case CC_GET_DISTANCE:
+            //Serial.println("Sending distance");
             SendSingleDistance();
             break;
         default:
@@ -103,7 +103,7 @@ void MoveBucket(int angle, int speed)
 
 void SendSingleDistance()
 {
-    //uint32_t distance = bucketRanger.readRangeSingleMillimeters();
-    //Serial.printf("Distance: '%i'\n", distance);
     SendEspNowDistance(bucketRanger.readRangeSingleMillimeters());
 }
+
+

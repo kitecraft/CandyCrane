@@ -88,10 +88,12 @@ void RopeBarrellStepper::DropBucket()
 
 void RopeBarrellStepper::RaiseBucket()
 {
+	/*
 	if (_errorCondition) {
 		Serial.println("RopeBarrel: Error condition exists.  Unable to move rope barrel.");
 		return;
 	}
+	*/
 	Serial.printf("RopeBarrel: Moving Bucket Upwards '%i' steps\n", _ropeBarrelMaxiumSteps);
 	_stepper->newMoveCCW(_ropeBarrelMaxiumSteps);  // moves x steps to 0 where is is the current step count
 	SetBucketMotionStatus(true);

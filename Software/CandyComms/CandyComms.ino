@@ -1,42 +1,39 @@
 /*
- Name:		CCComms.ino
- Created:	4/8/2022 1:13:00 PM
+ Name:		CandyComms.ino
+ Created:	5/4/2022 9:31:57 AM
  Author:	Kitecraft
 */
 
-#include "src/CCComms_Config.h"
 #include "src/ESPNow/EspNowManager.h"
 #include "src/ESPNow/EspNowIncomingMessageQueue.h"
-//#include <SoftwareSerial.h>
 
-//SoftwareSerial swSer;
 EspNowIncomingMessageQueue g_espNowMessageQueue;
 
 void setup() {
-    Serial.begin(57600);
-    //Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
-    //swSer.begin(57600, SWSERIAL_8N1, 2, 0);
-    
+	Serial.begin(115200);
+	Serial.println("");
+
+    Serial.println("Starting ESPNow");
     if (!InitEspNow())
     {
         Serial.println("\n\nFailed to start ESPNow stuff.  As such, I will now refuse to continue.");
         while (true) { delay(1); }
     }
-    //swSer.flush();
+    Serial.println("Started");
 }
-
 
 void loop() {
     HandleSerialCommsData();
     HandleEspNowData();
 }
 
+
 void HandleSerialCommsData()
 {
     if (Serial.available()) {
         while (Serial.available()) {
             String line = Serial.readStringUntil('\n');
-            EspNowMessage newMessage(line);
+            EspNowMessage newMessage = EspNowMessageFromCsvString(line);
             SendEspNowCommand(newMessage);
         }
     }
@@ -45,9 +42,8 @@ void HandleSerialCommsData()
 void HandleEspNowData()
 {
     if (!g_espNowMessageQueue.IsQueueEmpty()) {
-        
         EspNowMessage currMessage = g_espNowMessageQueue.GetNextItem();
         Serial.flush();
-        Serial.println(currMessage.ToString());
+        Serial.println(EspNowMessageToCsvString(currMessage));
     }
 }

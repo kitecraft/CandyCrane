@@ -1,12 +1,12 @@
-#include "EspNowMessageQueue.h"
+#include "IncomeingMessageQueue.h"
 
-EspNowMessageQueue::EspNowMessageQueue()
+IncomeingMessageQueue::IncomeingMessageQueue()
 {
 	ArduinoQueue<EspNowMessage> messageQueue(5);
 	QueueMutex = portMUX_INITIALIZER_UNLOCKED;
 }
 
-void EspNowMessageQueue::AddItemToQueue(EspNowMessage message)
+void IncomeingMessageQueue::AddItemToQueue(EspNowMessage message)
 {
 	EspNowMessage qi(message);
 
@@ -15,12 +15,12 @@ void EspNowMessageQueue::AddItemToQueue(EspNowMessage message)
 	portEXIT_CRITICAL(&QueueMutex);
 }
 
-bool EspNowMessageQueue::IsQueueEmpty()
+bool IncomeingMessageQueue::IsQueueEmpty()
 {
 	return messageQueue.isEmpty();
 }
 
-EspNowMessage EspNowMessageQueue::GetNextItem()
+EspNowMessage IncomeingMessageQueue::GetNextItem()
 {
 	EspNowMessage ret;
 

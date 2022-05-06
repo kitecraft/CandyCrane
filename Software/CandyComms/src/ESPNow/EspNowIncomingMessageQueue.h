@@ -14,4 +14,3 @@ public:
 	bool IsQueueEmpty();
 	EspNowMessage GetNextItem();
 };
-

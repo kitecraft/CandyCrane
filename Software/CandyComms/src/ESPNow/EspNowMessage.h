@@ -50,15 +50,3 @@ static String EspNowMessageToCsvString(EspNowMessage msg)
     ret += String(msg.speed);
     return ret;
 }
-
-static void SendMessage(EspNowMessage msg)
-{
-    Serial2.println(EspNowMessageToCsvString(msg));
-}
-
-static void SendCommand(CANDY_CRANE_COMMANDS command)
-{
-    EspNowMessage msg;
-    msg.command = command;
-    SendMessage(msg);
-}

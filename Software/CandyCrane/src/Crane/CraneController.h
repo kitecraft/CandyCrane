@@ -1,15 +1,13 @@
 #pragma once
 #include <Arduino.h>
 #include "../CC_Config.h"
-#include "../ESPNow/EspNowMessageQueue.h"
-#include "../ESPNow/EspNowMessage.h"
-#include "../ESPNow/EspNowManager.h"
+#include "../Utilities/IncomeingMessageQueue.h"
 #include "DollyStepper.h"
 #include "RopeBarrellStepper.h"
 #include "TowerStepper.h"
 
 
-extern EspNowMessageQueue g_espNowMessageQueue;
+extern IncomeingMessageQueue g_incomeingMessageQueue;
 
 class CraneController
 {
@@ -43,7 +41,7 @@ private:
 	bool _bucketState = false;
 
 public:
-	void StartUp();
+	bool StartUp();
 	void Run();
 	void RunQueueHandler();
 

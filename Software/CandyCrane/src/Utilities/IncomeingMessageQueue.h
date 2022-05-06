@@ -1,16 +1,16 @@
 #pragma once
 #include <Arduino.h>
 #include <ArduinoQueue.h>
-#include "EspNowMessage.h"
+#include "../ESPNow/EspNowMessage.h"
 
-class EspNowMessageQueue
+class IncomeingMessageQueue
 {
 private:
 	ArduinoQueue<EspNowMessage> messageQueue;
 	portMUX_TYPE QueueMutex;
 
 public:
-	EspNowMessageQueue();
+	IncomeingMessageQueue();
 	void AddItemToQueue(EspNowMessage message);
 	bool IsQueueEmpty();
 	EspNowMessage GetNextItem();

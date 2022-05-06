@@ -10,7 +10,7 @@ bool DollyStepper::Init()
 	_muxDollyMotion = portMUX_INITIALIZER_UNLOCKED;
 
 	_stepper = new CheapStepper(DOLLY_STEPPER_PIN_1, DOLLY_STEPPER_PIN_2, DOLLY_STEPPER_PIN_3, DOLLY_STEPPER_PIN_4);
-	_stepper->setRpm(20);
+	_stepper->setRpm(12);
 	_dollyMaxiumSteps = DollyStepsForDistance(DOLLY_MAXIMUM_DISTANCE);
 	pinMode(DOLLY_LIMIT_SWITCH_PIN, INPUT_PULLUP);
 }
@@ -88,7 +88,8 @@ void DollyStepper::MoveDollyInwards()
 		return;
 	}
 	Serial.println("Moveing Dolly Inwards");
-	_stepper->newMoveCCW(_stepper->getStep());  // moves x steps to 0 where is is the current step count
+	//_stepper->newMoveCCW(_stepper->getStep());  // moves x steps to 0 where is is the current step count
+	_stepper->newMoveCCW(1000);  // moves x steps to 0 where is is the current step count
 	SetDollyMotionStatus(true);
 }
 

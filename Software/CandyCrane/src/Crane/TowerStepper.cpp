@@ -10,7 +10,8 @@ bool TowerStepper::Init()
 	_muxTowerMotion = portMUX_INITIALIZER_UNLOCKED;
 	_towerMaxiumSteps = TowerStepsForDistance(ROPE_BARREL_MAXIMUM_DISTANCE);
 	_stepper = new CheapStepper(TOWER_STEPPER_PIN_1, TOWER_STEPPER_PIN_2, TOWER_STEPPER_PIN_3, TOWER_STEPPER_PIN_4);
-	_stepper->setRpm(7);
+	_stepper->setRpm(9);
+	pinMode(TOWER_LIMIT_SWITCH_PIN, INPUT_PULLUP);
 	return true;
 }
 
@@ -100,4 +101,12 @@ void TowerStepper::StopTower()
 {
 	Serial.println("Stop the Tower, I'm getting off now.");
 	_stepper->stop();
+}
+
+bool TowerStepper::IsTowerLimitSwitchActive()
+{
+	if (digitalRead(TOWER_LIMIT_SWITCH_PIN) == LOW) {
+		return true;
+	}
+	return false;
 }

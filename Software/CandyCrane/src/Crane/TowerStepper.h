@@ -11,6 +11,7 @@ private:
 	int _towerMaxiumSteps = 0;
 	void SetTowerMotionStatus(bool status);
 	int TowerStepsForDistance(double distance) { return int(distance * (double)TOWER_STEPS_PER_MM); }
+	bool IsTowerLimitSwitchActive();
 
 	bool _errorCondition = false;
 
