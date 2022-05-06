@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>%{__DEVICE_NAME__}%</title>
+		<style>ul {list-style: none;padding: 0;argin: 0;}form li + li {margin-top: 1em;}label {display: inline-block;width: 150px;text-align: right;padding-left: 25px;padding-right: 10px;}vgtitle {text-align: center;display: inline-block;width: 400px;text-align: center;font-size: x-large;font-weight: 700;}</style>
+	</head>
+	<body>
+		<form action="/setupNet" method="post">
+			<ul>
+				<li>
+					<vgtitle>Candy Crane Home</vgtitle>
+				</li>
+				<li>
+					<div>Welcome to the Candy Crane</div>
+				</li>
+				<li>
+					<error>%{ERRORTEXT}%</error>
+				</li>
+				<li>
+					<label for="networkName">Network Name:</label>
+					<input type="text" id="networkName" name="networkName" value="%{NETWORKNAME}%" />
+				</li>
+				<li>
+					<label for="password">Password:</label>
+					<input type="password" id="password" name="password" value="" />
+				</li>
+				<li>
+					<label for="passwordConfirm">Confirm Password:</label>
+					<input type="password" id="passwordConfirm" name="passwordConfirm" value="" />
+				</li>
+			</li>
+			<li class="button">
+				<button type="submit">Submit</button>
+			</li>
+			<br>
+				<br>
+					<li/>
+				</li>
+				<a href="/reboot">Reboot %{__DEVICE_NAME__}%</a>
+				<li/>
+			</ul>
+		</form>
+	</body>
+</html>
