@@ -12,6 +12,10 @@
 #include <Wire.h>
 #include <VL53L0X.h>
 
+//
+//mac address: 
+//
+
 EspNowIncomingMessageQueue g_espNowMessageQueue;
 
 ServoEasing BucketServo;
@@ -74,6 +78,7 @@ void HandleEspNowData()
         //Serial.println("'");
         switch (currMessage.command) {
         case CC_PING:
+            //Serial.println("Sending Pong");
             SendEspNowCommand(CC_PONG);
             break;
         case CC_MOVE_BUCKET:

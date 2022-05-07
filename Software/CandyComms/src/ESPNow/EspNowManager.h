@@ -26,6 +26,8 @@ void OnDataRecv(uint8_t* mac, uint8_t* incomingData, uint8_t len) {
     EspNowMessage message;
     memcpy(&message, incomingData, sizeof(message));
     g_espNowMessageQueue.AddItemToQueue(message);
+    //Serial.println(EspNowMessageToCsvString(message));
+    
 }
 
 int32_t getWiFiChannel(const char* ssid) {

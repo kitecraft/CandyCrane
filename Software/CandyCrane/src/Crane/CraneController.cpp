@@ -5,9 +5,9 @@ bool CraneController::StartUp()
 	_muxBucketDistance = portMUX_INITIALIZER_UNLOCKED;
 	_muxBucketOpenClose = portMUX_INITIALIZER_UNLOCKED;
 
-	//_dolly.Init();
-	//_tower.Init();
-	//_ropebarrel.Init();
+	_dolly.Init();
+	_tower.Init();
+	_ropebarrel.Init();
 	
 	if (!CalibrateAll())
 	{
@@ -24,6 +24,9 @@ bool CraneController::CalibrateBucket()
 	}
 
 	CloseBucket();
+	OpenBucket();
+	CloseBucket();
+
 	if (!GetBucketDistance())
 	{
 		Serial.println("CalibrateBucket(): Failed to get bucket distance.");
@@ -33,32 +36,28 @@ bool CraneController::CalibrateBucket()
 
 	int distanceToMove = _bucketDistance - BUCKET_HOME_DISTANCE;
 
+	
 
-	return true;
-}
-
-bool CraneController::CalibrateTower()
-{
 	return true;
 }
 
 bool CraneController::CalibrateAll()
 {
-	//if (!CalibrateBucket())
-	//{
-	//	return false;
-	//}
+	if (!CalibrateBucket())
+	{
+		return false;
+	}
 
 
-	//if (!_dolly.Calibrate())
-	//{
-	//	return false;
-	//}
+	if (!_dolly.Calibrate())
+	{
+		return false;
+	}
 
-	//if (!CalibrateTower())
-	//{
-	//	return false;
-	//}
+	if (!_tower.Calibrate())
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -232,9 +231,9 @@ void CraneController::Run()
 		//vTaskDelay(1000);
 
 		
-		//_dolly.Process();
-		//_ropebarrel.Process();
-		//_tower.Process();
+		_dolly.Process();
+		_ropebarrel.Process();
+		_tower.Process();
 		
 		
 		/*
@@ -285,6 +284,8 @@ void CraneController::RunQueueHandler()
 	while (true) {
 		if (!g_incomeingMessageQueue.IsQueueEmpty()) {
 			EspNowMessage currentMessage = g_incomeingMessageQueue.GetNextItem();
+			Serial.print("Handling incomgin message: ");
+			Serial.println(currentMessage.command);
 			switch (currentMessage.command) {
 			case CC_PONG:
 				_bucketConnected = true;

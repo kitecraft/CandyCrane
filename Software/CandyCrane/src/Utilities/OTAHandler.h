@@ -3,6 +3,7 @@
 #include <ArduinoOTA.h>
 #include "../CC_Config.h"
 
+extern bool g_otaRunning = false;
 static void IRAM_ATTR OTAThread(void*)
 {
     static int OTA_Completion_Percentage = 0;

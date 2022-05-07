@@ -33,7 +33,6 @@ private:
 
 
 	bool CalibrateBucket();
-	bool CalibrateTower();
 	bool CalibrateAll();
 
 	/* stuff for testing, remove later or else....*/

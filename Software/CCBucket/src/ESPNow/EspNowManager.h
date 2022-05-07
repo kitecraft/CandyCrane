@@ -15,22 +15,21 @@ static uint8_t broadcastAddress[] = { 0x84, 0xCC, 0xA8, 0x83, 0xF1, 0xCA };  //C
 extern EspNowIncomingMessageQueue g_espNowMessageQueue;
 
 static void OnDataSent(uint8_t* mac_addr, uint8_t sendStatus) {
-    //Serial.print("Last Packet Send Status: ");
-    /*
+    Serial.print("Last Packet Send Status: ");
+    
     if (sendStatus == 0) {
         //Serial.println("Delivery success");
     }
     else {
         Serial.printf("Last Packet Send Status: Delivery fail  '%i'\n", sendStatus);
     }
-    */
 }
 
 static void OnDataRecv(uint8_t* mac, uint8_t* incomingData, uint8_t len) {
     EspNowMessage message;
     memcpy(&message, incomingData, sizeof(message));
     g_espNowMessageQueue.AddItemToQueue(message);
-    //Serial.println("Data Received");
+    Serial.println("Data Received");
 }
 
 int32_t getWiFiChannel(const char* ssid) {

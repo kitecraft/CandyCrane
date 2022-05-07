@@ -11,7 +11,7 @@ EspNowIncomingMessageQueue g_espNowMessageQueue;
 
 void setup() {
 	Serial.begin(115200);
-	Serial.println("");
+	//Serial.println("");
 
     Serial.println("Starting ESPNow");
     if (!InitEspNow())
@@ -19,7 +19,7 @@ void setup() {
         Serial.println("\n\nFailed to start ESPNow stuff.  As such, I will now refuse to continue.");
         while (true) { delay(1); }
     }
-    Serial.println("Started");
+    //Serial.println("Started");
 }
 
 void loop() {
@@ -43,7 +43,7 @@ void HandleEspNowData()
 {
     if (!g_espNowMessageQueue.IsQueueEmpty()) {
         EspNowMessage currMessage = g_espNowMessageQueue.GetNextItem();
-        Serial.flush();
+        //Serial.flush();
         Serial.println(EspNowMessageToCsvString(currMessage));
     }
 }

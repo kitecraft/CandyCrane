@@ -17,15 +17,17 @@ void IRAM_ATTR WebSeverThread(void*)
         Serial.println("MDNS responder started");
     }
 
-    server.on(F("/"), []() {
-        server.send(200, "text/plain", "hello from esp32!");
+    server.on("/", []() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_ROOT));
         });
 
-    server.on(F("/reboot"), []() {
+    server.on("/reboot", []() {
+        server.sendHeader("Location", "/");
+        server.send(303);
         ESP.restart();
         });
 
-    server.on(F("/net"), []() {
+    server.on("/net", []() {
         String webPage = IceFS_ReadFile(WEBPAGE_NETWORK);
         webPage.replace("%{__DEVICE_NAME__}%", __DEVICE_NAME__);
         webPage.replace("%{ERRORTEXT}%", "");
@@ -33,7 +35,7 @@ void IRAM_ATTR WebSeverThread(void*)
         server.send(200, "text/html", webPage);
         });
 
-    server.on(F("/setupNet"), []() {
+    server.on("/setupNet", []() {
         String webPage = IceFS_ReadFile(WEBPAGE_NETWORK);
         if (server.arg("password") != server.arg("passwordConfirm"))
         {
@@ -48,21 +50,116 @@ void IRAM_ATTR WebSeverThread(void*)
         server.send(200, "text/html", webPage);
         });
 
-
-    server.on(F("/commands/tower/Home"), [&]() {
-        server.send(200, "text/plain", "Homeing");
+    server.on("/commands", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
         });
 
-    server.on(F("/commands/tower/Stop"), [&]() {
+    // GENERAL
+    server.on("/commands/StopAll", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        //g_craneController
+        Serial.println("Emergency Stop");
+        });
+
+    server.on("/commands/Calibrate", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        //g_craneController
+        Serial.println("Starting calibration sequence");
+        });
+
+    // TOWER
+    server.on("/commands/tower/Home", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        //g_craneController
+        Serial.println("Homeing Tower");
+        });
+
+    server.on("/commands/tower/Stop", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
         g_craneController.StopTowerMotion();
-        server.send(200, "text/plain", "Stopped Tower");
+        Serial.println("Stopping Tower");
+        });
+
+    server.on("/commands/tower/MoveIn", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        g_craneController.MoveTowerInwards();
+        Serial.println("Moving Tower In");
+        });
+
+    server.on("/commands/tower/MoveOut", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        g_craneController.MoveTowerOutwards();
+        Serial.println("Moving Tower Out");
+        });
+
+    // DOLLY
+    server.on("/commands/dolly/Home", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        //g_craneController
+        Serial.println("Homeing Dolly");
+        });
+
+    server.on("/commands/dolly/Stop", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        g_craneController.StopDolly();
+        Serial.println("Stopping Dolly");
+        });
+
+    server.on("/commands/dolly/MoveIn", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        g_craneController.MoveDollyInwards();
+        Serial.println("Moving Dolly In");
+        });
+
+    server.on("/commands/dolly/MoveOut", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        g_craneController.MoveDollyOutwards();
+        Serial.println("Moving Dolly Out");
+        });
+
+    // BUCKET
+    server.on("/commands/bucket/Home", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        //g_craneController
+        Serial.println("Homeing Bucket");
+        });
+
+    server.on("/commands/bucket/Stop", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        g_craneController.StopBucketMotion();
+        Serial.println("Stopping Bucket");
+        });
+
+    server.on("/commands/bucket/MoveUp", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        g_craneController.MoveBucketUpwards();
+        Serial.println("Moving Bucket Up");
+        });
+
+    server.on("/commands/bucket/MoveDown", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        g_craneController.MoveBucketDownwards();
+        Serial.println("Moving Bucket Down");
+        });
+
+    server.on("/commands/bucket/Open", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        g_craneController.OpenBucket();
+        Serial.println("Opening Bucket");
+        });
+
+    server.on("/commands/bucket/Close", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        g_craneController.CloseBucket();
+        Serial.println("Closing Bucket");
         });
 
 
-
-    server.on(UriBraces("/users/{}"), []() {
-        String user = server.pathArg(0);
-        server.send(200, "text/plain", "User: '" + user + "'");
+    // AUTO
+    server.on("/commands/auto/Start", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        //g_craneController
+        Serial.println("Starting the sequence");
         });
 
     server.begin();

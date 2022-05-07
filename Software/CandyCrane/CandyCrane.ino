@@ -13,9 +13,6 @@
 #include "src/Utilities/IncomeingMessageQueue.h"
 #include "src/Utilities/OTAHandler.h"
 
-
-bool g_otaRunning = false;
-
 IncomeingMessageQueue g_incomeingMessageQueue;
 CraneController g_craneController;
 
@@ -33,6 +30,21 @@ void IRAM_ATTR CraneControllerQueueThread(void*)
     g_craneController.RunQueueHandler();
 }
 
+TaskHandle_t g_CCCommsHandle = nullptr;
+void IRAM_ATTR CCComsThread(void*)
+{
+    while (true) {
+        if (Serial2.available()) {
+            String line = Serial2.readStringUntil('\n');
+            //Serial.print("Got line: '");
+            //Serial.print(line);
+            //Serial.println("'");
+            g_incomeingMessageQueue.AddItemToQueue(EspNowMessageFromCsvString(line));
+        }
+        vTaskDelay(1);
+    }
+}
+
 bool setupComplete = true;
 void setup() {
     Serial.begin(115200);
@@ -40,6 +52,14 @@ void setup() {
     Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
 
     StartNetworkStuff();
+
+    Serial.println("Starting the comms");
+    xTaskCreatePinnedToCore(CCComsThread,
+        "CCComms Loop",
+        STACK_SIZE, nullptr,
+        CANDY_CRANE_COMMS_HANDLER_PRIORITY,
+        &g_CCCommsHandle,
+        CANDY_CRANE_COMMS_CORE);
 
     Serial.println("Starting the crane");
     xTaskCreatePinnedToCore(CraneControllerQueueThread,
@@ -65,30 +85,7 @@ void setup() {
     Serial.println("\n\n---\nBeginning Run mode.");
 }
 
-
 void loop() {
-    HandleInput();
-}
-
-void HandleInput()
-{
-    if (Serial2.available()) {
-        String line = Serial2.readStringUntil('\n');
-        Serial.print("Got line: '");
-        Serial.print(line);
-        Serial.println("'");
-        g_incomeingMessageQueue.AddItemToQueue(EspNowMessageFromCsvString(line));
-    }
-}
-
-void StopAll()
-{
-
-}
-
-void StopAllAndHome()
-{
-
 }
 
 void StartNetworkStuff()
@@ -106,57 +103,3 @@ void StartNetworkStuff()
     Serial.println("Starting Webserver");
     xTaskCreatePinnedToCore(WebSeverThread, "WebServer Loop", STACK_SIZE, nullptr, WEB_SERVER_PRIORITY, &g_webServerHandle, WEBSERVER_CORE);
 }
-
-/*
-void HandleButtonPress()
-{
-    int button = g_buttonManager.HandleButtonInterrupt();
-
-    if (button != NO_PIN)
-    {
-        Serial.printf("Button pressed: '%i'\n", button);
-        switch (button) {
-        case btn_Emergency_StopHome:
-            break;
-        case btn_Tower_Forward:
-            g_craneController.MoveTowerOutwards();
-            break;
-        case btn_Tower_StopHome:
-            g_craneController.StopTowerMotion();
-            break;
-        case btn_Tower_Backward:
-            g_craneController.MoveTowerInwards();
-            break;
-        case btn_Dolly_Outwards:
-            g_craneController.MoveDollyOutwards();
-            break;
-        case btn_Dolly_StopHome:
-            g_craneController.IsDollyInMotion() ?
-                g_craneController.StopDolly() : 
-                g_craneController.RecalibrateDolly();
-            break;
-        case btn_Dolly_Inwards:
-            g_craneController.MoveDollyInwards();
-            break;
-        case btn_Bucket_Up:
-            g_craneController.MoveBucketUpwards();
-            break;
-        case btn_Bucket_StopHome:
-            g_craneController.StopBucketMotion();
-            break;
-        case btn_Bucket_Down:
-            g_craneController.MoveBucketDownwards();
-            break;
-        case btn_Bucket_Open:
-            Serial.println("Opening Bucket");
-            g_craneController.OpenBucket();
-            break;
-        case btn_Bucket_Close:
-            Serial.println("Closing Closing");
-            g_craneController.CloseBucket();
-            break;
-
-        }
-    }
-}
-*/
