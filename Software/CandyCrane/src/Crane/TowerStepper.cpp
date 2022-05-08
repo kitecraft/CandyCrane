@@ -11,7 +11,7 @@ bool TowerStepper::Init()
 	_stepper = new CheapStepper(TOWER_STEPPER_PIN_1, TOWER_STEPPER_PIN_2, TOWER_STEPPER_PIN_3, TOWER_STEPPER_PIN_4);
 	_stepper->setTotalSteps(1024);
 	_stepper->setRpm(2);
-	_towerMaxiumSteps = TowerStepsForDistance(ROPE_BARREL_MAXIMUM_DISTANCE);
+	_towerMaxiumSteps = TowerStepsForDistance(TOWER_MAXIMUM_DISTANCE);
 	pinMode(TOWER_LIMIT_SWITCH_PIN, INPUT_PULLUP);
 	return true;
 }
@@ -36,7 +36,7 @@ bool TowerStepper::Calibrate()
 
 	//_stepper->stop();
 	delay(100);
-	_stepper->moveCW(TowerStepsForDistance(5));
+	_stepper->moveCW(TowerStepsForDistance(3));
 	_stepper->setCurrentPositionAsHome();
 
 	_errorCondition = false;

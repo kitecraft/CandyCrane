@@ -13,16 +13,18 @@ private:
 	void SetBucketMotionStatus(bool status);
 	int RopeBarrelStepsForDistance(double distance) { return int(distance * (double)ROPE_BARREL_STEPS_PER_MM); }
 
-	bool _errorCondition = false;
 public:
 	RopeBarrellStepper();
 	bool Init();
-	bool Calibrate();
 
 	void Process();
 	void DropBucket();
+	void DropBucket(int mm);
+	void RaiseBucket(int mm);
 	void RaiseBucket();
 	void StopBucket();
 	bool IsBucketInMotion();
+
+	void SetBucketHomeAsCurrent() { _stepper->setCurrentPositionAsHome(); }
 };
 

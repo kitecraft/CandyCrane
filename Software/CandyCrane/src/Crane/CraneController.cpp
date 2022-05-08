@@ -19,6 +19,7 @@ bool CraneController::StartUp()
 
 bool CraneController::CalibrateBucket()
 {
+	Serial.println("\n\n--Bucket Calibartion\n");
 	while (!_bucketConnected) {
 		WaitforBucketConnect();
 	}
@@ -32,11 +33,32 @@ bool CraneController::CalibrateBucket()
 		Serial.println("CalibrateBucket(): Failed to get bucket distance.");
 		return false;
 	}
-	Serial.printf("Bucket distance is: '%i'", _bucketDistance);
+	Serial.printf("Bucket distance is: '%i'\n", _bucketDistance);
 
 	int distanceToMove = _bucketDistance - BUCKET_HOME_DISTANCE;
+	Serial.printf("Moving bucket %i mm\n", distanceToMove);
+	if (distanceToMove < 0) {
+		_ropebarrel.DropBucket(distanceToMove * -1);
+	}
+	else {
+		_ropebarrel.RaiseBucket(distanceToMove);
+	}
 
-	
+	while (_ropebarrel.IsBucketInMotion())
+	{
+		_ropebarrel.Process();
+		vTaskDelay(1);
+	}
+
+	delay(1000);
+
+	if (!GetBucketDistance())
+	{
+		Serial.println("CalibrateBucket(): Failed to get bucket distance After Move.");
+		return false;
+	}
+	Serial.printf("Bucket distance is: '%i'\n\n\n--------\n", _bucketDistance);
+	_ropebarrel.SetBucketHomeAsCurrent();
 
 	return true;
 }
@@ -47,7 +69,6 @@ bool CraneController::CalibrateAll()
 	{
 		return false;
 	}
-
 
 	if (!_dolly.Calibrate())
 	{
@@ -84,6 +105,7 @@ bool CraneController::WaitforBucketConnect()
 
 bool CraneController::GetBucketDistance()
 {
+	_bucketDistance = BUCKET_NO_DISTANCE;
 	SendCommand(CC_GET_DISTANCE);
 
 	// wait for distance to be updated

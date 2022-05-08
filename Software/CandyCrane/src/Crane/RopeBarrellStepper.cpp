@@ -13,29 +13,13 @@ bool RopeBarrellStepper::Init()
 	_stepper->setRpm(20);
 	return true;
 }
-
-bool RopeBarrellStepper::Calibrate()
-{
-
-	return true;
-}
-
 void RopeBarrellStepper::Process()
 {
 	if (IsBucketInMotion())
 	{
-		if (_errorCondition)
-		{
-			Serial.println("RopeBarrel: Error condition exists.  Unable to move dolly.");
-			_stepper->stop();
-			SetBucketMotionStatus(false);
-			return;
-		}
-
 		if (_stepper->getStepsLeft() != 0)
 		{
-			/*
-			if (_stepper->getStep() < _ropeBarrelMaxiumSteps + 1)
+			if (_stepper->getStep() < _ropeBarrelMaxiumSteps + 1 )
 			{
 				_stepper->run();
 			}
@@ -43,13 +27,10 @@ void RopeBarrellStepper::Process()
 				Serial.println("RopeBarrel: Bucket: Ending run due to a limit being hit");
 				_stepper->stop();
 				SetBucketMotionStatus(false);
-				_errorCondition = true;
 			}
-			*/
-			_stepper->run();
 		}
 		else {
-			Serial.println("RopeBarrel: Bucket Move complete.");
+			Serial.printf("RopeBarrel: Bucket Move complete. Current Step: %i\n", _stepper->getStep());
 			SetBucketMotionStatus(false);
 		}
 	}
@@ -74,30 +55,31 @@ bool RopeBarrellStepper::IsBucketInMotion()
 
 void RopeBarrellStepper::DropBucket()
 {
-	if (_errorCondition) {
-		Serial.println("RopeBarrel: Error condition exists.  Unable to move rope barrel.");
-		return;
-	}
+	DropBucket(ROPE_BARREL_MAXIMUM_DISTANCE);
+}
 
-	
-	Serial.printf("RopeBarrel: Moving Bucket Downwards '%i' steps\n", _ropeBarrelMaxiumSteps);
-	_stepper->newMoveCW(_ropeBarrelMaxiumSteps);
+void RopeBarrellStepper::DropBucket(int mm)
+{
+	Serial.printf("Dropbucket: Current step: %i\n", _stepper->getStep());
+	int numberOfStepsToMove = RopeBarrelStepsForDistance(mm);
+	Serial.printf("RopeBarrel: Moving Bucket Downwards '%i' steps\n", numberOfStepsToMove);
+	_stepper->newMoveCW(numberOfStepsToMove);
 	SetBucketMotionStatus(true);
-
 }
 
 void RopeBarrellStepper::RaiseBucket()
 {
-	/*
-	if (_errorCondition) {
-		Serial.println("RopeBarrel: Error condition exists.  Unable to move rope barrel.");
-		return;
-	}
-	*/
-	Serial.printf("RopeBarrel: Moving Bucket Upwards '%i' steps\n", _ropeBarrelMaxiumSteps);
-	_stepper->newMoveCCW(_ropeBarrelMaxiumSteps);  // moves x steps to 0 where is is the current step count
+	RaiseBucket(ROPE_BARREL_MAXIMUM_DISTANCE);
+}
+
+void RopeBarrellStepper::RaiseBucket(int mm)
+{
+	int numberOfStepsToMove = RopeBarrelStepsForDistance(mm);
+	Serial.printf("RopeBarrel: Moving Bucket Upwards '%i' steps\n", numberOfStepsToMove);
+	_stepper->newMoveCCW(numberOfStepsToMove);  // moves x steps to 0 where is is the current step count
 	SetBucketMotionStatus(true);
 }
+
 
 void RopeBarrellStepper::StopBucket()
 {

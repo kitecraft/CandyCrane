@@ -33,7 +33,6 @@ private:
 
 
 	bool CalibrateBucket();
-	bool CalibrateAll();
 
 	/* stuff for testing, remove later or else....*/
 	unsigned long _nextMove = 0;
@@ -43,6 +42,9 @@ public:
 	bool StartUp();
 	void Run();
 	void RunQueueHandler();
+
+	bool CalibrateAll();
+	void StopAll() { StopDolly(); StopTowerMotion(); StopBucketMotion(); }
 
 	void MoveDollyOutwards();
 	void MoveDollyInwards();

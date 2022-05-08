@@ -57,13 +57,13 @@ void IRAM_ATTR WebSeverThread(void*)
     // GENERAL
     server.on("/commands/StopAll", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        //g_craneController
+        g_craneController.StopAll();
         Serial.println("Emergency Stop");
         });
 
     server.on("/commands/Calibrate", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        //g_craneController
+        g_craneController.CalibrateAll();
         Serial.println("Starting calibration sequence");
         });
 
