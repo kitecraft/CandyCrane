@@ -33,7 +33,7 @@ bool CraneController::CalibrateBucket()
 		Serial.println("CalibrateBucket(): Failed to get bucket distance.");
 		return false;
 	}
-	Serial.printf("Bucket distance is: '%i'\n", _bucketDistance);
+	//Serial.printf("Bucket distance is: '%i'\n", _bucketDistance);
 
 	int distanceToMove = _bucketDistance - BUCKET_HOME_DISTANCE;
 	Serial.printf("Moving bucket %i mm\n", distanceToMove);
@@ -57,7 +57,7 @@ bool CraneController::CalibrateBucket()
 		Serial.println("CalibrateBucket(): Failed to get bucket distance After Move.");
 		return false;
 	}
-	Serial.printf("Bucket distance is: '%i'\n\n\n--------\n", _bucketDistance);
+	//Serial.printf("Bucket distance is: '%i'\n\n\n--------\n", _bucketDistance);
 	_ropebarrel.SetBucketHomeAsCurrent();
 
 	return true;
@@ -117,6 +117,7 @@ bool CraneController::GetBucketDistance()
 		
 		if(distance != BUCKET_NO_DISTANCE)
 		{
+			Serial.printf("Bucket distance is: '%i'\n", distance);
 			return true;
 		}
 		vTaskDelay(5);
@@ -126,20 +127,17 @@ bool CraneController::GetBucketDistance()
 
 bool CraneController::OpenBucket()
 {
-	Serial.printf("Open to: '%i'\n", DEFAULT_BUCKET_OPEN_ANGLE);
 	return OpenCloseBucket(DEFAULT_BUCKET_OPEN_ANGLE, DEFAULT_BUCKET_OPEN_SPEED);
 }
 
 bool CraneController::CloseBucket()
 {
-	Serial.printf("Close to: '%i'\n", DEFAULT_BUCKET_CLOSED_ANGLE);
 	return OpenCloseBucket(DEFAULT_BUCKET_CLOSED_ANGLE, DEFAULT_BUCKET_CLOSE_SPEED);
 }
 
 bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed)
 {
 	_bucketOpenCloseComplete = false;
-	Serial.println("Open/Close bucket");
 
 	EspNowMessage message;
 	message.command = CC_MOVE_BUCKET;
@@ -155,12 +153,10 @@ bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed)
 
 		if (state)
 		{
-			Serial.println("Bucket move complete");
 			return true;
 		}
 		vTaskDelay(5);
 	}
-	Serial.println("Bucket move failed");
 	return false;
 }
 
@@ -177,12 +173,6 @@ bool CraneController::SendBucketHeartbeat()
 		return true;
 	}
 	return false;
-}
-
-void CraneController::RecalibrateDolly()
-{
-	Serial.println("Recalibrating Dolly");
-	_dolly.Calibrate();
 }
 
 void CraneController::MoveDollyOutwards()
@@ -306,8 +296,6 @@ void CraneController::RunQueueHandler()
 	while (true) {
 		if (!g_incomeingMessageQueue.IsQueueEmpty()) {
 			EspNowMessage currentMessage = g_incomeingMessageQueue.GetNextItem();
-			Serial.print("Handling incomgin message: ");
-			Serial.println(currentMessage.command);
 			switch (currentMessage.command) {
 			case CC_PONG:
 				_bucketConnected = true;

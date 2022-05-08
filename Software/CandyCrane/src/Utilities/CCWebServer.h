@@ -64,7 +64,6 @@ void IRAM_ATTR WebSeverThread(void*)
     server.on("/commands/Calibrate", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
         g_craneController.CalibrateAll();
-        Serial.println("Starting calibration sequence");
         });
 
     // TOWER

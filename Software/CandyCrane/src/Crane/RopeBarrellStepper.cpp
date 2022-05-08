@@ -10,7 +10,7 @@ bool RopeBarrellStepper::Init()
 	_muxBucketMotion = portMUX_INITIALIZER_UNLOCKED;
 	_ropeBarrelMaxiumSteps = RopeBarrelStepsForDistance(ROPE_BARREL_MAXIMUM_DISTANCE);
 	_stepper = new CheapStepper(ROPE_BARREL_STEPPER_PIN_1, ROPE_BARREL_STEPPER_PIN_2, ROPE_BARREL_STEPPER_PIN_3, ROPE_BARREL_STEPPER_PIN_4);
-	_stepper->setRpm(20);
+	_stepper->setRpm(16);
 	return true;
 }
 void RopeBarrellStepper::Process()
@@ -60,9 +60,7 @@ void RopeBarrellStepper::DropBucket()
 
 void RopeBarrellStepper::DropBucket(int mm)
 {
-	Serial.printf("Dropbucket: Current step: %i\n", _stepper->getStep());
 	int numberOfStepsToMove = RopeBarrelStepsForDistance(mm);
-	Serial.printf("RopeBarrel: Moving Bucket Downwards '%i' steps\n", numberOfStepsToMove);
 	_stepper->newMoveCW(numberOfStepsToMove);
 	SetBucketMotionStatus(true);
 }
@@ -75,7 +73,6 @@ void RopeBarrellStepper::RaiseBucket()
 void RopeBarrellStepper::RaiseBucket(int mm)
 {
 	int numberOfStepsToMove = RopeBarrelStepsForDistance(mm);
-	Serial.printf("RopeBarrel: Moving Bucket Upwards '%i' steps\n", numberOfStepsToMove);
 	_stepper->newMoveCCW(numberOfStepsToMove);  // moves x steps to 0 where is is the current step count
 	SetBucketMotionStatus(true);
 }
@@ -83,6 +80,5 @@ void RopeBarrellStepper::RaiseBucket(int mm)
 
 void RopeBarrellStepper::StopBucket()
 {
-	Serial.println("RopeBarrel: Stop the Bucket, It's time to take a dump");
 	_stepper->stop();
 }

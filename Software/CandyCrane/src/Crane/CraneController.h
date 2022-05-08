@@ -23,7 +23,6 @@ private:
 	unsigned long _nextHeartbeat = 0;
 
 	bool WaitforBucketConnect();
-	bool GetBucketDistance();
 	bool OpenCloseBucket(int moveToAngle, int moveSpeed);
 	bool SendBucketHeartbeat();
 
@@ -43,6 +42,7 @@ public:
 	void Run();
 	void RunQueueHandler();
 
+	bool GetBucketDistance();
 	bool CalibrateAll();
 	void StopAll() { StopDolly(); StopTowerMotion(); StopBucketMotion(); }
 
@@ -50,7 +50,6 @@ public:
 	void MoveDollyInwards();
 	void StopDolly();
 	bool IsDollyInMotion();
-	void RecalibrateDolly();
 
 	void MoveBucketDownwards();
 	void MoveBucketUpwards();
