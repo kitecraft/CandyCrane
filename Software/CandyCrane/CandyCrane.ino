@@ -12,9 +12,11 @@
 #include "src/Crane/CraneController.h"
 #include "src/Utilities/IncomeingMessageQueue.h"
 #include "src/Utilities/OTAHandler.h"
+#include "src/Crane/AutoCraneSequence.h"
 
 IncomeingMessageQueue g_incomeingMessageQueue;
 CraneController g_craneController;
+void (*g_AutoCraneStepList[])() = { AutoCrane_Step1, autoCrane_Step2, autoCrane_Step3, autoCrane_Step4, autoCrane_Step5, autoCrane_Step6, autoCrane_Step7 };
 
 TaskHandle_t g_CraneControllerHandle = nullptr;
 TaskHandle_t g_webServerHandle = nullptr;
@@ -46,6 +48,7 @@ void IRAM_ATTR CCComsThread(void*)
 }
 
 bool setupComplete = true;
+
 void setup() {
     Serial.begin(115200);
     Serial2.begin(115200);
@@ -85,8 +88,15 @@ void setup() {
     Serial.println("\n\n---\nBeginning Run mode.");
 }
 
+
 void loop() {
+    if (g_craneController.GetAutoCraneStatus()) {
+        //Serial.printf("Crane is in auto mode: %i\n", g_AutoCraneCurrentStep);
+        g_AutoCraneStepList[g_AutoCraneCurrentStep]();
+    }
 }
+
+
 
 void StartNetworkStuff()
 {

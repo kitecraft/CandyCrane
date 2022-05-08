@@ -33,15 +33,13 @@ bool CraneController::CalibrateBucket()
 		Serial.println("CalibrateBucket(): Failed to get bucket distance.");
 		return false;
 	}
-	//Serial.printf("Bucket distance is: '%i'\n", _bucketDistance);
-
-	int distanceToMove = _bucketDistance - BUCKET_HOME_DISTANCE;
+	int distanceToMove = 80 - _bucketDistance;
 	Serial.printf("Moving bucket %i mm\n", distanceToMove);
-	if (distanceToMove < 0) {
-		_ropebarrel.DropBucket(distanceToMove * -1);
+	if (distanceToMove > 0) {
+		_ropebarrel.DropBucket(distanceToMove);
 	}
 	else {
-		_ropebarrel.RaiseBucket(distanceToMove);
+		_ropebarrel.RaiseBucket(distanceToMove * -1);
 	}
 
 	while (_ropebarrel.IsBucketInMotion())
@@ -58,6 +56,29 @@ bool CraneController::CalibrateBucket()
 		return false;
 	}
 	//Serial.printf("Bucket distance is: '%i'\n\n\n--------\n", _bucketDistance);
+
+	distanceToMove = 30 - _bucketDistance;
+	Serial.printf("Moving bucket %i mm\n", distanceToMove);
+	if (distanceToMove > 0) {
+		_ropebarrel.DropBucket(distanceToMove);
+	}
+	else {
+		_ropebarrel.RaiseBucket(distanceToMove * -1);
+	}
+
+	while (_ropebarrel.IsBucketInMotion())
+	{
+		_ropebarrel.Process();
+		vTaskDelay(1);
+	}
+
+	delay(1000);
+
+	if (!GetBucketDistance())
+	{
+		Serial.println("CalibrateBucket(): Failed to get bucket distance After Move.");
+		return false;
+	}
 	_ropebarrel.SetBucketHomeAsCurrent();
 
 	return true;
@@ -125,17 +146,7 @@ bool CraneController::GetBucketDistance()
 	return false;
 }
 
-bool CraneController::OpenBucket()
-{
-	return OpenCloseBucket(DEFAULT_BUCKET_OPEN_ANGLE, DEFAULT_BUCKET_OPEN_SPEED);
-}
-
-bool CraneController::CloseBucket()
-{
-	return OpenCloseBucket(DEFAULT_BUCKET_CLOSED_ANGLE, DEFAULT_BUCKET_CLOSE_SPEED);
-}
-
-bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed)
+bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed, bool async)
 {
 	_bucketOpenCloseComplete = false;
 
@@ -144,6 +155,10 @@ bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed)
 	message.angle = moveToAngle;
 	message.speed = moveingSpeed;
 	SendMessage(message);
+
+	if (async) {
+		return true;
+	}
 
 	unsigned long endWait = millis() + BUCKET_MOVE_WAIT_TIME;
 	while (millis() < endWait) {
@@ -173,56 +188,6 @@ bool CraneController::SendBucketHeartbeat()
 		return true;
 	}
 	return false;
-}
-
-void CraneController::MoveDollyOutwards()
-{
-	_dolly.MoveDollyOutwards();
-}
-
-void CraneController::MoveDollyInwards()
-{
-	_dolly.MoveDollyInwards();
-}
-
-void CraneController::StopDolly()
-{
-	_dolly.StopDolly();
-}
-
-bool CraneController::IsDollyInMotion()
-{
-	return _dolly.IsDollyInMotion();
-}
-
-void CraneController::MoveBucketDownwards()
-{
-	_ropebarrel.DropBucket();
-}
-
-void CraneController::MoveBucketUpwards()
-{
-	_ropebarrel.RaiseBucket();
-}
-
-void CraneController::StopBucketMotion()
-{
-	_ropebarrel.StopBucket();
-}
-
-void CraneController::MoveTowerOutwards()
-{
-	_tower.MoveTowerOutwards();
-}
-
-void CraneController::MoveTowerInwards()
-{
-	_tower.MoveTowerInwards();
-}
-
-void CraneController::StopTowerMotion()
-{
-	_tower.StopTower();
 }
 
 

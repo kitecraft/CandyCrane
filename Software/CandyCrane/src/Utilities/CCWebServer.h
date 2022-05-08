@@ -7,6 +7,7 @@
 #include "../CC_Config.h"
 #include "IceFS.h"
 #include "../Crane/CraneController.h"
+#include "../Crane/AutoCraneSequence.h"
 
 static WebServer server(80);
 extern CraneController g_craneController;
@@ -63,102 +64,122 @@ void IRAM_ATTR WebSeverThread(void*)
 
     server.on("/commands/Calibrate", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.CalibrateAll();
+        if(!g_craneController.GetAutoCraneStatus())
+            g_craneController.CalibrateAll();
         });
 
     // TOWER
     server.on("/commands/tower/Home", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        //g_craneController
+        g_craneController.MoveTowerTo(0);
         Serial.println("Homeing Tower");
         });
 
     server.on("/commands/tower/Stop", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.StopTowerMotion();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.StopTowerMotion();
         Serial.println("Stopping Tower");
         });
 
     server.on("/commands/tower/MoveIn", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.MoveTowerInwards();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.MoveTowerInwards();
         Serial.println("Moving Tower In");
         });
 
     server.on("/commands/tower/MoveOut", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.MoveTowerOutwards();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.MoveTowerOutwards();
         Serial.println("Moving Tower Out");
         });
 
     // DOLLY
     server.on("/commands/dolly/Home", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        //g_craneController
+        g_craneController.MoveDollyTo(0);
         Serial.println("Homeing Dolly");
         });
 
     server.on("/commands/dolly/Stop", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.StopDolly();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.StopDolly();
         Serial.println("Stopping Dolly");
         });
 
     server.on("/commands/dolly/MoveIn", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.MoveDollyInwards();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.MoveDollyInwards();
         Serial.println("Moving Dolly In");
         });
 
     server.on("/commands/dolly/MoveOut", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.MoveDollyOutwards();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.MoveDollyOutwards();
         Serial.println("Moving Dolly Out");
         });
 
     // BUCKET
     server.on("/commands/bucket/Home", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        //g_craneController
+        g_craneController.MoveBucketTo(0);
         Serial.println("Homeing Bucket");
         });
 
     server.on("/commands/bucket/Stop", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.StopBucketMotion();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.StopBucketMotion();
         Serial.println("Stopping Bucket");
         });
 
     server.on("/commands/bucket/MoveUp", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.MoveBucketUpwards();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.MoveBucketUpwards();
         Serial.println("Moving Bucket Up");
         });
 
     server.on("/commands/bucket/MoveDown", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.MoveBucketDownwards();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.MoveBucketDownwards();
         Serial.println("Moving Bucket Down");
         });
 
     server.on("/commands/bucket/Open", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.OpenBucket();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.OpenBucket();
         Serial.println("Opening Bucket");
         });
 
     server.on("/commands/bucket/Close", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        g_craneController.CloseBucket();
+        if (!g_craneController.GetAutoCraneStatus())
+            g_craneController.CloseBucket();
         Serial.println("Closing Bucket");
         });
 
 
     // AUTO
-    server.on("/commands/auto/Start", [&]() {
+    server.on("/commands/auto/Start1", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
-        //g_craneController
-        Serial.println("Starting the sequence");
+        Serial.println("Starting the sequence for Candy A");
+        if (!g_craneController.GetAutoCraneStatus())
+            StartAutoCrane_CandyA();
+        });
+
+    server.on("/commands/auto/Start2", [&]() {
+        server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
+        Serial.println("Starting the sequence for Candy B");
+        if (!g_craneController.GetAutoCraneStatus())
+            StartAutoCrane_CandyB();
         });
 
     server.begin();

@@ -16,15 +16,19 @@ private:
 public:
 	RopeBarrellStepper();
 	bool Init();
-
 	void Process();
-	void DropBucket();
-	void DropBucket(int mm);
-	void RaiseBucket(int mm);
-	void RaiseBucket();
+
 	void StopBucket();
 	bool IsBucketInMotion();
 
+	void DropBucket();
+	void DropBucket(int mm);
+	
+	void RaiseBucket(int mm);
+	void RaiseBucket();
+	
+	void MoveBucketTo(int mmFromHome);
+	
 	void SetBucketHomeAsCurrent() { _stepper->setCurrentPositionAsHome(); }
 };
 

@@ -81,6 +81,26 @@ void DollyStepper::MoveDollyInwards()
 	SetDollyMotionStatus(true);
 }
 
+void DollyStepper::MoveDollyTo(int mm)
+{
+	if (_errorCondition) {
+		Serial.println("Dolly: Error condition exists.  Unable to move dolly.");
+		return;
+	}
+
+	int stepToMoveTo = DollyStepsForDistance(mm);
+	int stepsToMove = stepToMoveTo - _stepper->getStep();
+	//Serial.printf("MoveDollyTo:  '%i' mm, '%i' step', '%i' current step, '%i' steps to move\n", mm, stepToMoveTo, _stepper->getStep(), stepsToMove);
+	if (stepsToMove > 0)
+	{
+		_stepper->newMoveCW(stepsToMove);
+	}
+	else {
+		_stepper->newMoveCCW(stepsToMove * -1);
+	}
+	SetDollyMotionStatus(true);
+}
+
 void DollyStepper::StopDolly()
 {
 	_stepper->stop();

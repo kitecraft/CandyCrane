@@ -24,7 +24,9 @@ public:
 	void Process();
 	void MoveDollyOutwards();
 	void MoveDollyInwards();
+	void MoveDollyTo(int mm);
 	void StopDolly();
 	bool IsDollyInMotion();
+
 };
 

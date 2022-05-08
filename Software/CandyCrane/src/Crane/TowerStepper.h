@@ -23,6 +23,7 @@ public:
 	void Process();
 	void MoveTowerOutwards();
 	void MoveTowerInwards();
+	void MoveTowerTo(int mm);
 	void StopTower();
 	bool IsTowerInMotion();
 };

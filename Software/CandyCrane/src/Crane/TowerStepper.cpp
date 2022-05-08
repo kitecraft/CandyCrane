@@ -57,7 +57,7 @@ void TowerStepper::Process()
 
 		if (_stepper->getStepsLeft() != 0)
 		{
-			if (_stepper->getStep() < _towerMaxiumSteps + 1)
+			if (!IsTowerLimitSwitchActive() && (_stepper->getStep() < _towerMaxiumSteps + 1))
 			{
 				_stepper->run();
 			}
@@ -112,6 +112,25 @@ void TowerStepper::MoveTowerInwards()
 		return;
 	}
 	_stepper->newMoveCCW(_stepper->getStep());  // moves x steps to 0 where is is the current step count
+	SetTowerMotionStatus(true);
+}
+
+void TowerStepper::MoveTowerTo(int mm)
+{
+	if (_errorCondition) {
+		Serial.println("Tower: Error condition exists.  Unable to move tower.");
+		return;
+	}
+
+	int stepToMoveTo = TowerStepsForDistance(mm);
+	int stepsToMove = stepToMoveTo - _stepper->getStep();
+	if (stepsToMove > 0)
+	{
+		_stepper->newMoveCW(stepsToMove);
+	}
+	else {
+		_stepper->newMoveCCW(stepsToMove * -1);
+	}
 	SetTowerMotionStatus(true);
 }
 

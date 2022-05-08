@@ -10,7 +10,7 @@ bool RopeBarrellStepper::Init()
 	_muxBucketMotion = portMUX_INITIALIZER_UNLOCKED;
 	_ropeBarrelMaxiumSteps = RopeBarrelStepsForDistance(ROPE_BARREL_MAXIMUM_DISTANCE);
 	_stepper = new CheapStepper(ROPE_BARREL_STEPPER_PIN_1, ROPE_BARREL_STEPPER_PIN_2, ROPE_BARREL_STEPPER_PIN_3, ROPE_BARREL_STEPPER_PIN_4);
-	_stepper->setRpm(16);
+	_stepper->setRpm(20);
 	return true;
 }
 void RopeBarrellStepper::Process()
@@ -19,7 +19,7 @@ void RopeBarrellStepper::Process()
 	{
 		if (_stepper->getStepsLeft() != 0)
 		{
-			if (_stepper->getStep() < _ropeBarrelMaxiumSteps + 1 )
+			if (_stepper->getStep() < _ropeBarrelMaxiumSteps + 1)
 			{
 				_stepper->run();
 			}
@@ -74,6 +74,20 @@ void RopeBarrellStepper::RaiseBucket(int mm)
 {
 	int numberOfStepsToMove = RopeBarrelStepsForDistance(mm);
 	_stepper->newMoveCCW(numberOfStepsToMove);  // moves x steps to 0 where is is the current step count
+	SetBucketMotionStatus(true);
+}
+
+void RopeBarrellStepper::MoveBucketTo(int mmFromHome)
+{
+	int stepToMoveTo = RopeBarrelStepsForDistance(mmFromHome);
+	int stepsToMove = stepToMoveTo - _stepper->getStep();
+	if (stepsToMove > 0)
+	{
+		_stepper->newMoveCW(stepsToMove);
+	}
+	else {
+		_stepper->newMoveCCW(stepsToMove);
+	}
 	SetBucketMotionStatus(true);
 }
 
