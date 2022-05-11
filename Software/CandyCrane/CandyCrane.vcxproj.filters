@@ -64,6 +64,9 @@
     <ClInclude Include="src\Utilities\OTAHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Crane\AutoCraneSequence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Crane\CraneController.cpp">

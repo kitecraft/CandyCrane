@@ -22,7 +22,7 @@ static bool connectToNetwork()
     bool connected = false;
     while (tryCount <= NETWORK_TRY_TIMES) {
         Serial.printf("Try #%i to connect to network '%s'\n", tryCount, GetSsid());
-        WiFi.disconnect(true);
+        //WiFi.disconnect(true);
         WiFi.begin(GetSsid().c_str(), GetSsidPassword().c_str(), 1);
         int waitCount = 0;
         while (waitCount < NETWORK_WAIT_TIME_PER_TRY * 2) {

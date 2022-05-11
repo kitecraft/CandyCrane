@@ -13,6 +13,8 @@ bool DollyStepper::Init()
 	_stepper->setRpm(20);
 	_dollyMaxiumSteps = DollyStepsForDistance(DOLLY_MAXIMUM_DISTANCE);
 	pinMode(DOLLY_LIMIT_SWITCH_PIN, INPUT_PULLUP);
+
+	return true;
 }
 
 

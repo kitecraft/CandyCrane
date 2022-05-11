@@ -32,7 +32,6 @@ private:
 	DollyStepper _dolly;
 	TowerStepper _tower;
 
-
 	bool CalibrateBucket();
 
 	/* stuff for testing, remove later or else....*/
@@ -48,6 +47,7 @@ public:
 
 	bool GetBucketDistance();
 	bool CalibrateAll();
+	bool CalibrateDolly() { return  _dolly.Calibrate(); }
 	void StopAll() { StopDolly(); StopTowerMotion(); StopBucketMotion(); _CraneInAutoMode = false; }
 
 	void MoveDollyOutwards() { _dolly.MoveDollyOutwards(); }

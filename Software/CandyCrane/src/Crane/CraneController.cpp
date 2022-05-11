@@ -9,20 +9,24 @@ bool CraneController::StartUp()
 	_tower.Init();
 	_ropebarrel.Init();
 	
+	
 	if (!CalibrateAll())
 	{
 		Serial.println("CraneController::StartUp() - Failed to calibrate");
 		return false;
 	}
+	
 	return true;
 }
 
 bool CraneController::CalibrateBucket()
 {
 	Serial.println("\n\n--Bucket Calibartion\n");
-	while (!_bucketConnected) {
-		WaitforBucketConnect();
+	//while (!_bucketConnected) {
+	if (!WaitforBucketConnect()){
+		return false;
 	}
+	//}
 
 	CloseBucket();
 	OpenBucket();
@@ -86,10 +90,13 @@ bool CraneController::CalibrateBucket()
 
 bool CraneController::CalibrateAll()
 {
+	/*
 	if (!CalibrateBucket())
 	{
 		return false;
 	}
+	*/
+	CalibrateBucket();
 
 	if (!_dolly.Calibrate())
 	{
