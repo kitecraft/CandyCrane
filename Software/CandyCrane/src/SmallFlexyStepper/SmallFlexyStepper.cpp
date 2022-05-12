@@ -750,18 +750,6 @@ bool SmallFlexyStepper::moveToHomeInSteps(long directionTowardHome,
 
 
   //
-  //  move forward 10 steps off the switch
-  // 
-
-  //
-  // Move off the switch by 10 steps before setting home
-  //
-  setTargetPositionRelativeInSteps(directionTowardHome * -10);
-  while (!processMovement())
-  {
-  }
-
-  //
   // successfully homed, set the current position to 0
   //
   setCurrentPositionInSteps(0L);    

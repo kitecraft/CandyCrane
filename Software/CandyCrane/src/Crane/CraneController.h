@@ -4,7 +4,8 @@
 #include "../Utilities/IncomeingMessageQueue.h"
 #include "DollyStepper.h"
 #include "RopeBarrellStepper.h"
-#include "TowerStepper.h"
+//#include "TowerStepper.h"
+#include "../Utilities/CraneStepper.h"
 
 
 extern IncomeingMessageQueue g_incomeingMessageQueue;
@@ -29,8 +30,10 @@ private:
 	bool SendBucketHeartbeat();
 
 	RopeBarrellStepper _ropebarrel;
-	DollyStepper _dolly;
-	TowerStepper _tower;
+	//DollyStepper _dolly;
+	//TowerStepper _tower;
+	CraneStepper _dolly;
+	CraneStepper _tower;
 
 	bool CalibrateBucket();
 
@@ -50,11 +53,11 @@ public:
 	bool CalibrateDolly() { return  _dolly.Calibrate(); }
 	void StopAll() { StopDolly(); StopTowerMotion(); StopBucketMotion(); _CraneInAutoMode = false; }
 
-	void MoveDollyOutwards() { _dolly.MoveDollyOutwards(); }
-	void MoveDollyInwards() { _dolly.MoveDollyInwards(); }
-	void MoveDollyTo(int mmFromHome) { _dolly.MoveDollyTo(mmFromHome); }
-	void StopDolly() { _dolly.StopDolly(); }
-	bool IsDollyInMotion() { return _dolly.IsDollyInMotion(); }
+	void MoveDollyOutwards() { _dolly.MoveOut(); }
+	void MoveDollyInwards() { _dolly.MoveIn(); }
+	void MoveDollyTo(int mmFromHome) { _dolly.MoveToMM(mmFromHome); }
+	void StopDolly() { _dolly.DeadStop(); }
+	bool IsDollyInMotion() { return _dolly.IsInMotion(); }
 
 	void MoveBucketDownwards() { _ropebarrel.DropBucket(); }
 	void MoveBucketUpwards() { _ropebarrel.RaiseBucket(); }
@@ -62,11 +65,11 @@ public:
 	void StopBucketMotion() { _ropebarrel.StopBucket(); }
 	bool IsBucketInMotion() { return _ropebarrel.IsBucketInMotion(); }
 
-	void MoveTowerOutwards() { _tower.MoveTowerOutwards(); }
-	void MoveTowerInwards() { _tower.MoveTowerInwards(); }
-	void MoveTowerTo(int mmFromHome) { _tower.MoveTowerTo(mmFromHome); }
-	void StopTowerMotion() { _tower.StopTower(); }
-	bool IsTowerInMotion() { return _tower.IsTowerInMotion(); }
+	void MoveTowerOutwards() { _tower.MoveOut(); }
+	void MoveTowerInwards() { _tower.MoveIn(); }
+	void MoveTowerTo(int mmFromHome) { _tower.MoveToMM(mmFromHome); }
+	void StopTowerMotion() { _tower.DeadStop(); }
+	bool IsTowerInMotion() { return _tower.IsInMotion(); }
 
 	bool OpenBucket() { return OpenCloseBucket(DEFAULT_BUCKET_OPEN_ANGLE, DEFAULT_BUCKET_OPEN_SPEED); }
 	void OpenBucketAsync() { OpenCloseBucket(DEFAULT_BUCKET_OPEN_ANGLE, DEFAULT_BUCKET_OPEN_SPEED, true); }

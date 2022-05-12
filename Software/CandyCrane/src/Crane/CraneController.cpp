@@ -5,8 +5,21 @@ bool CraneController::StartUp()
 	_muxBucketDistance = portMUX_INITIALIZER_UNLOCKED;
 	_muxBucketOpenClose = portMUX_INITIALIZER_UNLOCKED;
 
-	_dolly.Init();
-	_tower.Init();
+	_dolly.Init(DOLLY_STEPPER_PIN_1, DOLLY_STEPPER_PIN_2, DOLLY_STEPPER_PIN_3, DOLLY_STEPPER_PIN_4);
+	_dolly.ConnectToLimitSwitch(DOLLY_LIMIT_SWITCH_PIN);
+	_dolly.SetStepsPerMM(DOLLY_STEPS_PER_MM);
+	_dolly.SetMaximumDistance(DOLLY_MAXIMUM_DISTANCE);
+	_dolly.SetSpeed(DOLLY_SPEED_STEPS_SECOND);
+	_dolly.SetAcceleration(DOLLY_ACCEL_STEPS_SECOND);
+
+	
+	_tower.Init(TOWER_STEPPER_PIN_1, TOWER_STEPPER_PIN_2, TOWER_STEPPER_PIN_3, TOWER_STEPPER_PIN_4);
+	_tower.ConnectToLimitSwitch(TOWER_LIMIT_SWITCH_PIN);
+	_tower.SetStepsPerMM(TOWER_STEPS_PER_MM);
+	_tower.SetMaximumDistance(TOWER_MAXIMUM_DISTANCE);
+	_tower.SetSpeed(TOWER_SPEED_STEPS_SECOND);
+	_tower.SetAcceleration(TOWER_ACCEL_STEPS_SECOND);
+
 	_ropebarrel.Init();
 	
 	
@@ -101,6 +114,9 @@ bool CraneController::CalibrateAll()
 	{
 		return false;
 	}
+
+	_tower.DisableStepper();
+	_dolly.DisableStepper();
 
 	return true;
 }
