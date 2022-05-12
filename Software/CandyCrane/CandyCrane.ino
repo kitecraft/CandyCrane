@@ -113,3 +113,12 @@ void StartNetworkStuff()
     Serial.println("Starting Webserver");
     xTaskCreatePinnedToCore(WebSeverThread, "WebServer Loop", STACK_SIZE, nullptr, WEB_SERVER_PRIORITY, &g_webServerHandle, WEBSERVER_CORE);
 }
+
+/*
+Compiling 'CandyCrane' for 'ESP32 Dev Module                                                                                                              (esp32_esp32)'
+Program size: 863,857 bytes (used 44% of a 1,966,080 byte maximum) (105.36 secs)
+Minimum Memory Usage: 37368 bytes (11% of a 327680 byte maximum)
+
+
+
+*/

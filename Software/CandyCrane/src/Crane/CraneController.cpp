@@ -90,12 +90,6 @@ bool CraneController::CalibrateBucket()
 
 bool CraneController::CalibrateAll()
 {
-	/*
-	if (!CalibrateBucket())
-	{
-		return false;
-	}
-	*/
 	CalibrateBucket();
 
 	if (!_dolly.Calibrate())

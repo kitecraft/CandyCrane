@@ -1,11 +1,13 @@
 #pragma once
 #include <Arduino.h>
-#include <CheapStepper.h>
+//#include <CheapStepper.h>
+#include "../SmallFlexyStepper/SmallFlexyStepper.h"
 #include "../CC_Config.h"
 class TowerStepper
 {
 private:
-	CheapStepper* _stepper;
+	//CheapStepper* _stepper;
+	SmallFlexyStepper _stepper;
 	bool _isTowerInMotion = false;
 	portMUX_TYPE _muxTowerMotion;
 	int _towerMaxiumSteps = 0;
