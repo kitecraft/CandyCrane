@@ -20,8 +20,8 @@ static void StartAutoCrane(int candyOption)
     }
 
     g_AutoCraneCurrentStep = 0;
-    g_craneController.MoveDollyTo(200);
-    vTaskDelay(7000);
+    g_craneController.MoveDollyTo(220);
+    vTaskDelay(3000);
     g_craneController.MoveTowerTo(moveTo);
     g_craneController.SetAutoCraneStatus(true);
 }
