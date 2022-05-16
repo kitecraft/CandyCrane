@@ -43,13 +43,7 @@
     <ClInclude Include="src\ESPNow\EspNowMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Crane\DollyStepper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Crane\RopeBarrellStepper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Crane\TowerStepper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utilities\IncomeingMessageQueue.h">
@@ -78,13 +72,7 @@
     <ClCompile Include="src\Crane\CraneController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Crane\DollyStepper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Crane\RopeBarrellStepper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Crane\TowerStepper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utilities\IncomeingMessageQueue.cpp">

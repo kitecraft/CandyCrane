@@ -68,11 +68,11 @@ static void SendEspNowCommand(EspNowMessage espNowOutgoingMessage)
     esp_now_send(broadcastAddress, (uint8_t*)&espNowOutgoingMessage, sizeof(espNowOutgoingMessage));
 }
 
-static void SendEspNowDistance(int distance)
+static void SendEspNowDistance(float distance)
 {
     EspNowMessage message;
     message.command = CC_BUCKET_DISTANCE;
-    message.distance = distance;
+    message.distance = distance * 100;
     esp_now_send(broadcastAddress, (uint8_t*)&message, sizeof(message));
 }
 

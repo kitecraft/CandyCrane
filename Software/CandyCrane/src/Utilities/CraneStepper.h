@@ -37,19 +37,27 @@ public:
 	void ConnectToLimitSwitch(byte pinNumber);
 	void SetMotionStatus(bool status);
 	bool IsInMotion();
+
 	void SetStepsPerMM(double steps) { _stepsPerMM = steps;  }
-	void SetMaximumDistance(byte mmFromHome) { _maximumDistance = StepsForDistance(mmFromHome); }
-	float GetCurrentPosition() { return _stepper.getCurrentPositionInSteps(); }
+	void SetMaximumDistance(int mmFromHome) { _maximumDistance = StepsForDistance(mmFromHome); }
 	long GetMaximumStep() { return _maximumDistance; }
 	long StepsForDistance(float distance) { return round(distance * _stepsPerMM); }
+
+	float GetCurrentPosition() { return _stepper.getCurrentPositionInSteps(); }
+
+	void SetCurrentPositionAsHome() { _stepper.setCurrentPositionInSteps(0); }
+	void SetCurrentPoistion(long pos) { _stepper.setCurrentPositionInSteps(pos); }
 	bool IsLimitSwitchActive() { return ((digitalRead(_limitSwitchPin) == LOW) ? true : false); }
 	void DisableStepper() { _stepper.disable(); }
 	STEPPER_MOVE_ERROR IsMaximumLimitReached();
 	STEPPER_MOVE_ERROR IsMiniumLimitReached();
 
-	bool Calibrate();
+
+	bool Calibrate(int stepsPerSec);
 	STEPPER_MOVE_ERROR MoveOut();
+	STEPPER_MOVE_ERROR MoveOutMM(float mmToMoveOutwards);
 	STEPPER_MOVE_ERROR MoveIn();
+	STEPPER_MOVE_ERROR MoveInMM(float mmToMoveInwards);
 	STEPPER_MOVE_ERROR MoveToMM(float mm);
 	void DeadStop() { _stepper.deadStop(); }
 

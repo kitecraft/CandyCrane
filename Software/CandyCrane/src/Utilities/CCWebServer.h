@@ -59,6 +59,7 @@ void IRAM_ATTR WebSeverThread(void*)
     server.on("/commands/StopAll", [&]() {
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
         g_craneController.StopAll();
+        g_craneController.DisableAll();
         Serial.println("Emergency Stop");
         });
 

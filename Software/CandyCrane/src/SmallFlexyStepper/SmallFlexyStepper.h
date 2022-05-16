@@ -43,7 +43,7 @@
 //
 class SmallFlexyStepper
 {
-  public:
+public:
     //
     // public functions
     //
@@ -61,7 +61,7 @@ class SmallFlexyStepper
     void moveToPositionInMillimeters(float absolutePositionToMoveToInMillimeters);
     void setTargetPositionInMillimeters(float absolutePositionToMoveToInMillimeters);
     float getCurrentVelocityInMillimetersPerSecond();
-   
+
     void setStepsPerRevolution(float motorStepPerRevolution);
     void setCurrentPositionInRevolutions(float currentPositionInRevolutions);
     float getCurrentPositionInRevolutions();
@@ -86,19 +86,19 @@ class SmallFlexyStepper
     void setTargetPositionToStop();
     void deadStop();
     bool motionComplete();
-    float getCurrentVelocityInStepsPerSecond(); 
+    float getCurrentVelocityInStepsPerSecond();
     void disable();
 
     bool processMovement(void);
 
 
-  private:
+private:
     //
     // private functions
     //
     void DeterminePeriodOfNextStep();
 
- 
+
     //
     // private member variables
     //
@@ -126,4 +126,3 @@ class SmallFlexyStepper
 
 // ------------------------------------ End ---------------------------------
 #endif
-

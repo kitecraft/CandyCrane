@@ -38,6 +38,7 @@ STEPPER_MOVE_ERROR CraneStepper::IsMaximumLimitReached()
 {
 	if (_stepper.getCurrentPositionInSteps() > GetMaximumStep())
 	{
+		Serial.println("Maximum Limit Reached");
 		return SME_MAXIMUM_TRAVEL_LIMIT_REACHED;
 	}
 	return SME_NONE;
@@ -47,34 +48,51 @@ STEPPER_MOVE_ERROR CraneStepper::IsMiniumLimitReached()
 {
 	if (_usingLimitSwitch) {
 		if (IsLimitSwitchActive()) {
+			Serial.println("Limit switch active");
 			return SME_LIMIT_SWITCH_ACTIVE;
 		}
 	}
 	else {
 		if (_stepper.getCurrentPositionInSteps() <= 0) {
+			Serial.println("Minimum Limit Reached");
 			return SME_MINIMUM_TRAVEL_LIMIT_REACHED;
 		}
 	}
 	return SME_NONE;
 }
 
-bool CraneStepper::Calibrate()
+bool CraneStepper::Calibrate(int stepsPerSec)
 {
 	if (!_usingLimitSwitch) {
 		return false;
 	}
-	return _stepper.moveToHomeInSteps(DIRECTION_IN, 100, GetMaximumStep() + 20, _limitSwitchPin);
+	return _stepper.moveToHomeInSteps(DIRECTION_IN, stepsPerSec, GetMaximumStep() + 20, _limitSwitchPin);
 }
 
 STEPPER_MOVE_ERROR CraneStepper::MoveOut()
+{
+	Serial.println("Moving this outwards");
+	STEPPER_MOVE_ERROR state = IsMaximumLimitReached();
+	if (state != SME_NONE) {
+		return state;
+	}
+	_direction = DIRECTION_OUT;
+	_stepper.setTargetPositionInSteps(GetMaximumStep());
+	SetMotionStatus(true);
+	Serial.printf("Current: %i to: %i\n", _stepper.getCurrentPositionInSteps(), GetMaximumStep());
+	return SME_NONE;
+}
+
+STEPPER_MOVE_ERROR CraneStepper::MoveOutMM(float mmToMoveOutwards)
 {
 	STEPPER_MOVE_ERROR state = IsMaximumLimitReached();
 	if (state != SME_NONE) {
 		return state;
 	}
 	_direction = DIRECTION_OUT;
+	long steps = StepsForDistance(mmToMoveOutwards);
 	SetMotionStatus(true);
-	_stepper.setTargetPositionInSteps(GetMaximumStep());
+	_stepper.setTargetPositionInSteps(_stepper.getCurrentPositionInSteps() + steps);
 	return SME_NONE;
 }
 
@@ -85,10 +103,26 @@ STEPPER_MOVE_ERROR CraneStepper::MoveIn()
 		return state;
 	}
 	_direction = DIRECTION_IN;
-	SetMotionStatus(true);
+	Serial.printf("Current: %i to: %i\n", _stepper.getCurrentPositionInSteps(), 0);
 	_stepper.setTargetPositionInSteps(0);
+	SetMotionStatus(true);
 	return SME_NONE;
 }
+
+STEPPER_MOVE_ERROR CraneStepper::MoveInMM(float mmToMoveInwards)
+{
+	STEPPER_MOVE_ERROR state = IsMiniumLimitReached();
+	if (state != SME_NONE) {
+		return state;
+	}
+	long steps = StepsForDistance(mmToMoveInwards);
+	_direction = DIRECTION_IN;
+	Serial.printf("Moving in %i steps.\n", steps);
+	_stepper.setTargetPositionInSteps(_stepper.getCurrentPositionInSteps() - steps);
+	SetMotionStatus(true);
+	return SME_NONE;
+}
+
 
 STEPPER_MOVE_ERROR CraneStepper::MoveToMM(float mm)
 {
@@ -107,8 +141,8 @@ STEPPER_MOVE_ERROR CraneStepper::MoveToMM(float mm)
 		_direction = DIRECTION_IN;
 	}
 
-	SetMotionStatus(true);
 	_stepper.setTargetPositionInSteps(stepToMoveTo);
+	SetMotionStatus(true);
 	return SME_NONE;
 }
 

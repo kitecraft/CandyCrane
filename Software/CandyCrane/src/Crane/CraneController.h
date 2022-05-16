@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "../CC_Config.h"
 #include "../Utilities/IncomeingMessageQueue.h"
-#include "DollyStepper.h"
+//#include "DollyStepper.h"
 #include "RopeBarrellStepper.h"
 //#include "TowerStepper.h"
 #include "../Utilities/CraneStepper.h"
@@ -17,8 +17,6 @@ private:
 	bool _CraneInAutoMode = false;
 
 	bool _bucketConnected = false;
-	uint32_t _bucketDistance = BUCKET_NO_DISTANCE;
-	portMUX_TYPE _muxBucketDistance;
 	bool _bucketOpenCloseComplete = false;
 	portMUX_TYPE _muxBucketOpenClose;
 
@@ -48,10 +46,10 @@ public:
 	void SetAutoCraneStatus(bool status) { _CraneInAutoMode = status; }
 	bool GetAutoCraneStatus() { return _CraneInAutoMode; }
 
-	bool GetBucketDistance();
 	bool CalibrateAll();
-	bool CalibrateDolly() { return  _dolly.Calibrate(); }
+	//bool CalibrateDolly() { return  _dolly.Calibrate(); }
 	void StopAll() { StopDolly(); StopTowerMotion(); StopBucketMotion(); _CraneInAutoMode = false; }
+	void DisableAll() { _dolly.DisableStepper(); _tower.DisableStepper(); _ropebarrel.Disable(); }
 
 	void MoveDollyOutwards() { _dolly.MoveOut(); }
 	void MoveDollyInwards() { _dolly.MoveIn(); }
@@ -63,7 +61,7 @@ public:
 	void MoveBucketUpwards() { _ropebarrel.RaiseBucket(); }
 	void MoveBucketTo(int mmFromHome) { _ropebarrel.MoveBucketTo(mmFromHome); }
 	void StopBucketMotion() { _ropebarrel.StopBucket(); }
-	bool IsBucketInMotion() { return _ropebarrel.IsBucketInMotion(); }
+	bool IsBucketInMotion() { return _ropebarrel.IsInMotion(); }
 
 	void MoveTowerOutwards() { _tower.MoveOut(); }
 	void MoveTowerInwards() { _tower.MoveIn(); }

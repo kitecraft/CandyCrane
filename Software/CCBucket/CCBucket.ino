@@ -108,7 +108,13 @@ void MoveBucket(int angle, int speed)
 
 void SendSingleDistance()
 {
-    SendEspNowDistance(bucketRanger.readRangeSingleMillimeters());
+    long totalDistance = 0;
+    for (int i = 0; i < NUMBER_DISTANCE_SAMPLES; i++) {
+        totalDistance += bucketRanger.readRangeSingleMillimeters();
+        delay(20);
+    }
+    SendEspNowDistance(totalDistance/ NUMBER_DISTANCE_SAMPLES);
+    //SendEspNowDistance(bucketRanger.readRangeSingleMillimeters());
 }
 
 

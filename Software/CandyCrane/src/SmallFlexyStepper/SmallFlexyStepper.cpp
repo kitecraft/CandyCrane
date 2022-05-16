@@ -185,18 +185,18 @@
 //
 SmallFlexyStepper::SmallFlexyStepper()
 {
-  //
-  // initialize constants
-  //
-  stepsPerRevolution = 4076L;
-  stepsPerMillimeter = 25.0;
-  directionOfMotion = 0;
-  currentPosition_InSteps = 0L;
-  targetPosition_InSteps = 0L;
-  setSpeedInStepsPerSecond(200);
-  setAccelerationInStepsPerSecondPerSecond(200.0);
-  currentStepPeriod_InUS = 0.0;
-  nextStepPeriod_InUS = 0.0;
+    //
+    // initialize constants
+    //
+    stepsPerRevolution = 4076L;
+    stepsPerMillimeter = 25.0;
+    directionOfMotion = 0;
+    currentPosition_InSteps = 0L;
+    targetPosition_InSteps = 0L;
+    setSpeedInStepsPerSecond(200);
+    setAccelerationInStepsPerSecondPerSecond(200.0);
+    currentStepPeriod_InUS = 0.0;
+    nextStepPeriod_InUS = 0.0;
 }
 
 
@@ -211,29 +211,29 @@ SmallFlexyStepper::SmallFlexyStepper()
 //
 void SmallFlexyStepper::connectToPins(byte inPin1, byte inPin2, byte inPin3, byte inPin4)
 {
-  //
-  // remember the pin numbers
-  //
+    //
+    // remember the pin numbers
+    //
     pin1 = inPin1;
     pin2 = inPin2;
     pin3 = inPin3;
     pin4 = inPin4;
     stepPhase = 0;
-  
-  //
-  // configure the IO bits
-  //
-  pinMode(pin1, OUTPUT);
-  digitalWrite(pin1, LOW);
 
-  pinMode(pin2, OUTPUT);
-  digitalWrite(pin2, LOW);
+    //
+    // configure the IO bits
+    //
+    pinMode(pin1, OUTPUT);
+    digitalWrite(pin1, LOW);
 
-  pinMode(pin3, OUTPUT);
-  digitalWrite(pin3, LOW);
+    pinMode(pin2, OUTPUT);
+    digitalWrite(pin2, LOW);
 
-  pinMode(pin4, OUTPUT);
-  digitalWrite(pin4, LOW);
+    pinMode(pin3, OUTPUT);
+    digitalWrite(pin3, LOW);
+
+    pinMode(pin4, OUTPUT);
+    digitalWrite(pin4, LOW);
 }
 
 
@@ -247,7 +247,7 @@ void SmallFlexyStepper::connectToPins(byte inPin1, byte inPin2, byte inPin3, byt
 //
 void SmallFlexyStepper::setStepsPerMillimeter(float motorStepsPerMillimeter)
 {
-  stepsPerMillimeter = motorStepsPerMillimeter;
+    stepsPerMillimeter = motorStepsPerMillimeter;
 }
 
 
@@ -259,7 +259,7 @@ void SmallFlexyStepper::setStepsPerMillimeter(float motorStepsPerMillimeter)
 //
 float SmallFlexyStepper::getCurrentPositionInMillimeters()
 {
-  return((float)getCurrentPositionInSteps() / stepsPerMillimeter);
+    return((float)getCurrentPositionInSteps() / stepsPerMillimeter);
 }
 
 
@@ -269,10 +269,10 @@ float SmallFlexyStepper::getCurrentPositionInMillimeters()
 // motor
 //
 void SmallFlexyStepper::setCurrentPositionInMillimeters(
-                   float currentPositionInMillimeters)
+    float currentPositionInMillimeters)
 {
-  setCurrentPositionInSteps((long) round(currentPositionInMillimeters * 
-                                         stepsPerMillimeter));
+    setCurrentPositionInSteps((long)round(currentPositionInMillimeters *
+        stepsPerMillimeter));
 }
 
 
@@ -285,7 +285,7 @@ void SmallFlexyStepper::setCurrentPositionInMillimeters(
 //
 void SmallFlexyStepper::setSpeedInMillimetersPerSecond(float speedInMillimetersPerSecond)
 {
-  setSpeedInStepsPerSecond(speedInMillimetersPerSecond * stepsPerMillimeter);
+    setSpeedInStepsPerSecond(speedInMillimetersPerSecond * stepsPerMillimeter);
 }
 
 
@@ -296,10 +296,10 @@ void SmallFlexyStepper::setSpeedInMillimetersPerSecond(float speedInMillimetersP
 //          units in millimeters/second/second
 //
 void SmallFlexyStepper::setAccelerationInMillimetersPerSecondPerSecond(
-                      float accelerationInMillimetersPerSecondPerSecond)
+    float accelerationInMillimetersPerSecondPerSecond)
 {
     setAccelerationInStepsPerSecondPerSecond(
-      accelerationInMillimetersPerSecondPerSecond * stepsPerMillimeter);
+        accelerationInMillimetersPerSecondPerSecond * stepsPerMillimeter);
 }
 
 
@@ -317,14 +317,14 @@ void SmallFlexyStepper::setAccelerationInMillimetersPerSecondPerSecond(
 //            configured to go low when at home
 //  Exit:   true returned if successful, else false
 //
-bool SmallFlexyStepper::moveToHomeInMillimeters(long directionTowardHome,  
-  float speedInMillimetersPerSecond, long maxDistanceToMoveInMillimeters, 
-  int homeLimitSwitchPin)
+bool SmallFlexyStepper::moveToHomeInMillimeters(long directionTowardHome,
+    float speedInMillimetersPerSecond, long maxDistanceToMoveInMillimeters,
+    int homeLimitSwitchPin)
 {
-  return(moveToHomeInSteps(directionTowardHome, 
-                          speedInMillimetersPerSecond * stepsPerMillimeter, 
-                          maxDistanceToMoveInMillimeters * stepsPerMillimeter, 
-                          homeLimitSwitchPin));
+    return(moveToHomeInSteps(directionTowardHome,
+        speedInMillimetersPerSecond * stepsPerMillimeter,
+        maxDistanceToMoveInMillimeters * stepsPerMillimeter,
+        homeLimitSwitchPin));
 }
 
 
@@ -337,10 +337,10 @@ bool SmallFlexyStepper::moveToHomeInMillimeters(long directionTowardHome,
 //
 void SmallFlexyStepper::moveRelativeInMillimeters(float distanceToMoveInMillimeters)
 {
-  setTargetPositionRelativeInMillimeters(distanceToMoveInMillimeters);
-  
-  while(!processMovement())
-    ;
+    setTargetPositionRelativeInMillimeters(distanceToMoveInMillimeters);
+
+    while (!processMovement())
+        ;
 }
 
 
@@ -352,10 +352,10 @@ void SmallFlexyStepper::moveRelativeInMillimeters(float distanceToMoveInMillimet
 //          current position in millimeters
 //
 void SmallFlexyStepper::setTargetPositionRelativeInMillimeters(
-                     float distanceToMoveInMillimeters)
+    float distanceToMoveInMillimeters)
 {
-  setTargetPositionRelativeInSteps((long) round(distanceToMoveInMillimeters * 
-                                                 stepsPerMillimeter));
+    setTargetPositionRelativeInSteps((long)round(distanceToMoveInMillimeters *
+        stepsPerMillimeter));
 }
 
 
@@ -367,12 +367,12 @@ void SmallFlexyStepper::setTargetPositionRelativeInMillimeters(
 //          move to in units of millimeters
 //
 void SmallFlexyStepper::moveToPositionInMillimeters(
-                    float absolutePositionToMoveToInMillimeters)
+    float absolutePositionToMoveToInMillimeters)
 {
-  setTargetPositionInMillimeters(absolutePositionToMoveToInMillimeters);
-  
-  while(!processMovement())
-    ;
+    setTargetPositionInMillimeters(absolutePositionToMoveToInMillimeters);
+
+    while (!processMovement())
+        ;
 }
 
 
@@ -384,10 +384,10 @@ void SmallFlexyStepper::moveToPositionInMillimeters(
 //          move to in units of millimeters
 //
 void SmallFlexyStepper::setTargetPositionInMillimeters(
-                    float absolutePositionToMoveToInMillimeters)
+    float absolutePositionToMoveToInMillimeters)
 {
- setTargetPositionInSteps((long) round(absolutePositionToMoveToInMillimeters * 
-                                       stepsPerMillimeter));
+    setTargetPositionInSteps((long)round(absolutePositionToMoveToInMillimeters *
+        stepsPerMillimeter));
 }
 
 
@@ -404,7 +404,7 @@ void SmallFlexyStepper::setTargetPositionInMillimeters(
 //
 float SmallFlexyStepper::getCurrentVelocityInMillimetersPerSecond()
 {
-  return(getCurrentVelocityInStepsPerSecond() / stepsPerMillimeter);
+    return(getCurrentVelocityInStepsPerSecond() / stepsPerMillimeter);
 }
 
 
@@ -418,7 +418,7 @@ float SmallFlexyStepper::getCurrentVelocityInMillimetersPerSecond()
 //
 void SmallFlexyStepper::setStepsPerRevolution(float motorStepPerRevolution)
 {
-  stepsPerRevolution = motorStepPerRevolution;
+    stepsPerRevolution = motorStepPerRevolution;
 }
 
 
@@ -430,7 +430,7 @@ void SmallFlexyStepper::setStepsPerRevolution(float motorStepPerRevolution)
 //
 float SmallFlexyStepper::getCurrentPositionInRevolutions()
 {
-  return((float)getCurrentPositionInSteps() / stepsPerRevolution);
+    return((float)getCurrentPositionInSteps() / stepsPerRevolution);
 }
 
 
@@ -440,10 +440,10 @@ float SmallFlexyStepper::getCurrentPositionInRevolutions()
 // motor
 //
 void SmallFlexyStepper::setCurrentPositionInRevolutions(
-                     float currentPositionInRevolutions)
+    float currentPositionInRevolutions)
 {
-  setCurrentPositionInSteps((long) round(currentPositionInRevolutions * 
-                                         stepsPerRevolution));
+    setCurrentPositionInSteps((long)round(currentPositionInRevolutions *
+        stepsPerRevolution));
 }
 
 
@@ -456,7 +456,7 @@ void SmallFlexyStepper::setCurrentPositionInRevolutions(
 //
 void SmallFlexyStepper::setSpeedInRevolutionsPerSecond(float speedInRevolutionsPerSecond)
 {
-  setSpeedInStepsPerSecond(speedInRevolutionsPerSecond * stepsPerRevolution);
+    setSpeedInStepsPerSecond(speedInRevolutionsPerSecond * stepsPerRevolution);
 }
 
 
@@ -467,10 +467,10 @@ void SmallFlexyStepper::setSpeedInRevolutionsPerSecond(float speedInRevolutionsP
 //          units in revolutions/second/second
 //
 void SmallFlexyStepper::setAccelerationInRevolutionsPerSecondPerSecond(
-       float accelerationInRevolutionsPerSecondPerSecond)
+    float accelerationInRevolutionsPerSecondPerSecond)
 {
     setAccelerationInStepsPerSecondPerSecond(
-      accelerationInRevolutionsPerSecondPerSecond * stepsPerRevolution);
+        accelerationInRevolutionsPerSecondPerSecond * stepsPerRevolution);
 }
 
 
@@ -488,14 +488,14 @@ void SmallFlexyStepper::setAccelerationInRevolutionsPerSecondPerSecond(
 //            configured to go low when at home
 //  Exit:   true returned if successful, else false
 //
-bool SmallFlexyStepper::moveToHomeInRevolutions(long directionTowardHome,  
-  float speedInRevolutionsPerSecond, long maxDistanceToMoveInRevolutions, 
-  int homeLimitSwitchPin)
+bool SmallFlexyStepper::moveToHomeInRevolutions(long directionTowardHome,
+    float speedInRevolutionsPerSecond, long maxDistanceToMoveInRevolutions,
+    int homeLimitSwitchPin)
 {
-  return(moveToHomeInSteps(directionTowardHome, 
-                          speedInRevolutionsPerSecond * stepsPerRevolution, 
-                          maxDistanceToMoveInRevolutions * stepsPerRevolution, 
-                          homeLimitSwitchPin));
+    return(moveToHomeInSteps(directionTowardHome,
+        speedInRevolutionsPerSecond * stepsPerRevolution,
+        maxDistanceToMoveInRevolutions * stepsPerRevolution,
+        homeLimitSwitchPin));
 }
 
 
@@ -508,10 +508,10 @@ bool SmallFlexyStepper::moveToHomeInRevolutions(long directionTowardHome,
 //
 void SmallFlexyStepper::moveRelativeInRevolutions(float distanceToMoveInRevolutions)
 {
-  setTargetPositionRelativeInRevolutions(distanceToMoveInRevolutions);
-  
-  while(!processMovement())
-    ;
+    setTargetPositionRelativeInRevolutions(distanceToMoveInRevolutions);
+
+    while (!processMovement())
+        ;
 }
 
 
@@ -523,10 +523,10 @@ void SmallFlexyStepper::moveRelativeInRevolutions(float distanceToMoveInRevoluti
 //            currentposition in revolutions
 //
 void SmallFlexyStepper::setTargetPositionRelativeInRevolutions(
-                     float distanceToMoveInRevolutions)
+    float distanceToMoveInRevolutions)
 {
-  setTargetPositionRelativeInSteps((long) round(distanceToMoveInRevolutions * 
-                                                stepsPerRevolution));
+    setTargetPositionRelativeInSteps((long)round(distanceToMoveInRevolutions *
+        stepsPerRevolution));
 }
 
 
@@ -538,12 +538,12 @@ void SmallFlexyStepper::setTargetPositionRelativeInRevolutions(
 //            move to in units of revolutions
 //
 void SmallFlexyStepper::moveToPositionInRevolutions(
-                    float absolutePositionToMoveToInRevolutions)
+    float absolutePositionToMoveToInRevolutions)
 {
-  setTargetPositionInRevolutions(absolutePositionToMoveToInRevolutions);
-  
-  while(!processMovement())
-    ;
+    setTargetPositionInRevolutions(absolutePositionToMoveToInRevolutions);
+
+    while (!processMovement())
+        ;
 }
 
 
@@ -555,10 +555,10 @@ void SmallFlexyStepper::moveToPositionInRevolutions(
 //          move to in units of revolutions
 //
 void SmallFlexyStepper::setTargetPositionInRevolutions(
-       float absolutePositionToMoveToInRevolutions)
+    float absolutePositionToMoveToInRevolutions)
 {
- setTargetPositionInSteps((long) round(absolutePositionToMoveToInRevolutions * 
-                                        stepsPerRevolution));
+    setTargetPositionInSteps((long)round(absolutePositionToMoveToInRevolutions *
+        stepsPerRevolution));
 }
 
 
@@ -575,7 +575,7 @@ void SmallFlexyStepper::setTargetPositionInRevolutions(
 //
 float SmallFlexyStepper::getCurrentVelocityInRevolutionsPerSecond()
 {
-  return(getCurrentVelocityInStepsPerSecond() / stepsPerRevolution);
+    return(getCurrentVelocityInStepsPerSecond() / stepsPerRevolution);
 }
 
 
@@ -590,7 +590,7 @@ float SmallFlexyStepper::getCurrentVelocityInRevolutionsPerSecond()
 //
 void SmallFlexyStepper::setCurrentPositionInSteps(long currentPositionInSteps)
 {
-  currentPosition_InSteps = currentPositionInSteps;
+    currentPosition_InSteps = currentPositionInSteps;
 }
 
 
@@ -602,7 +602,7 @@ void SmallFlexyStepper::setCurrentPositionInSteps(long currentPositionInSteps)
 //
 long SmallFlexyStepper::getCurrentPositionInSteps()
 {
-  return(currentPosition_InSteps);
+    return(currentPosition_InSteps);
 }
 
 
@@ -614,8 +614,8 @@ long SmallFlexyStepper::getCurrentPositionInSteps()
 //
 void SmallFlexyStepper::setSpeedInStepsPerSecond(float speedInStepsPerSecond)
 {
-  desiredSpeed_InStepsPerSecond = speedInStepsPerSecond;
-  desiredPeriod_InUSPerStep = 1000000.0 / desiredSpeed_InStepsPerSecond;
+    desiredSpeed_InStepsPerSecond = speedInStepsPerSecond;
+    desiredPeriod_InUSPerStep = 1000000.0 / desiredSpeed_InStepsPerSecond;
 }
 
 
@@ -626,14 +626,14 @@ void SmallFlexyStepper::setSpeedInStepsPerSecond(float speedInStepsPerSecond)
 //          steps/second/second
 //
 void SmallFlexyStepper::setAccelerationInStepsPerSecondPerSecond(
-                     float accelerationInStepsPerSecondPerSecond)
+    float accelerationInStepsPerSecondPerSecond)
 {
-  acceleration_InStepsPerSecondPerSecond = accelerationInStepsPerSecondPerSecond;
-  acceleration_InStepsPerUSPerUS = acceleration_InStepsPerSecondPerSecond / 1E12;
+    acceleration_InStepsPerSecondPerSecond = accelerationInStepsPerSecondPerSecond;
+    acceleration_InStepsPerUSPerUS = acceleration_InStepsPerSecondPerSecond / 1E12;
 
-  periodOfSlowestStep_InUS = 
-      1000000.0 / sqrt(2.0 * acceleration_InStepsPerSecondPerSecond);
-  minimumPeriodForAStoppedMotion = periodOfSlowestStep_InUS / 2.8;
+    periodOfSlowestStep_InUS =
+        1000000.0 / sqrt(2.0 * acceleration_InStepsPerSecondPerSecond);
+    minimumPeriodForAStoppedMotion = periodOfSlowestStep_InUS / 2.8;
 }
 
 
@@ -651,114 +651,114 @@ void SmallFlexyStepper::setAccelerationInStepsPerSecondPerSecond(
 //            configured to go low when at home
 //  Exit:   true returned if successful, else false
 //
-bool SmallFlexyStepper::moveToHomeInSteps(long directionTowardHome,  
-  float speedInStepsPerSecond, long maxDistanceToMoveInSteps, 
-  int homeLimitSwitchPin)
+bool SmallFlexyStepper::moveToHomeInSteps(long directionTowardHome,
+    float speedInStepsPerSecond, long maxDistanceToMoveInSteps,
+    int homeLimitSwitchPin)
 {
-  float originalDesiredSpeed_InStepsPerSecond;
-  bool limitSwitchFlag;
-  
-  
-  //
-  // setup the home switch input pin
-  //
-  pinMode(homeLimitSwitchPin, INPUT_PULLUP);
-  
-  
-  //
-  // remember the current speed setting
-  //
-  originalDesiredSpeed_InStepsPerSecond = desiredSpeed_InStepsPerSecond; 
- 
- 
-  //
-  // if the home switch is not already set, move toward it
-  //
-  if (digitalRead(homeLimitSwitchPin) == HIGH)
-  {
+    float originalDesiredSpeed_InStepsPerSecond;
+    bool limitSwitchFlag;
+
+
     //
-    // move toward the home switch
+    // setup the home switch input pin
     //
-    setSpeedInStepsPerSecond(speedInStepsPerSecond);
-    setTargetPositionRelativeInSteps(maxDistanceToMoveInSteps * directionTowardHome);
-    limitSwitchFlag = false;
-    while(!processMovement())
+    pinMode(homeLimitSwitchPin, INPUT_PULLUP);
+
+
+    //
+    // remember the current speed setting
+    //
+    originalDesiredSpeed_InStepsPerSecond = desiredSpeed_InStepsPerSecond;
+
+
+    //
+    // if the home switch is not already set, move toward it
+    //
+    if (digitalRead(homeLimitSwitchPin) == HIGH)
     {
-      if (digitalRead(homeLimitSwitchPin) == LOW)
-      {
-        limitSwitchFlag = true;
-        directionOfMotion = 0;
-        break;
-      }
+        //
+        // move toward the home switch
+        //
+        setSpeedInStepsPerSecond(speedInStepsPerSecond);
+        setTargetPositionRelativeInSteps(maxDistanceToMoveInSteps * directionTowardHome);
+        limitSwitchFlag = false;
+        while (!processMovement())
+        {
+            if (digitalRead(homeLimitSwitchPin) == LOW)
+            {
+                limitSwitchFlag = true;
+                directionOfMotion = 0;
+                break;
+            }
+        }
+
+        //
+        // check if switch never detected
+        //
+        if (limitSwitchFlag == false)
+            return(false);
     }
-    
+    delay(25);
+
+
+    //
+    // the switch has been detected, now move away from the switch
+    //
+    setTargetPositionRelativeInSteps(maxDistanceToMoveInSteps *
+        directionTowardHome * -1);
+    limitSwitchFlag = false;
+    while (!processMovement())
+    {
+        if (digitalRead(homeLimitSwitchPin) == HIGH)
+        {
+            limitSwitchFlag = true;
+            directionOfMotion = 0;
+            break;
+        }
+    }
+    delay(25);
+
     //
     // check if switch never detected
     //
     if (limitSwitchFlag == false)
-      return(false);
-  }
-  delay(25);
-  
+        return(false);
 
-  //
-  // the switch has been detected, now move away from the switch
-  //
-  setTargetPositionRelativeInSteps(maxDistanceToMoveInSteps * 
-                                   directionTowardHome * -1);
-  limitSwitchFlag = false;
-  while(!processMovement())
-  {
-    if (digitalRead(homeLimitSwitchPin) == HIGH)
+
+    //
+    // have now moved off the switch, move toward it again but slower
+    //
+    setSpeedInStepsPerSecond(speedInStepsPerSecond / 8);
+    setTargetPositionRelativeInSteps(maxDistanceToMoveInSteps * directionTowardHome);
+    limitSwitchFlag = false;
+    while (!processMovement())
     {
-      limitSwitchFlag = true;
-      directionOfMotion = 0;
-      break;
+        if (digitalRead(homeLimitSwitchPin) == LOW)
+        {
+            limitSwitchFlag = true;
+            directionOfMotion = 0;
+            break;
+        }
     }
-  }
-  delay(25);
-  
-  //
-  // check if switch never detected
-  //
-  if (limitSwitchFlag == false)
-    return(false);
+    delay(25);
+
+    //
+    // check if switch never detected
+    //
+    if (limitSwitchFlag == false)
+        return(false);
 
 
-  //
-  // have now moved off the switch, move toward it again but slower
-  //
-  setSpeedInStepsPerSecond(speedInStepsPerSecond/8);
-  setTargetPositionRelativeInSteps(maxDistanceToMoveInSteps * directionTowardHome);
-  limitSwitchFlag = false;
-  while(!processMovement())
-  {
-    if (digitalRead(homeLimitSwitchPin) == LOW)
-    {
-      limitSwitchFlag = true;
-      directionOfMotion = 0;
-      break;
-    }
-  }
-  delay(25);
-  
-  //
-  // check if switch never detected
-  //
-  if (limitSwitchFlag == false)
-    return(false);
+    //
+    // successfully homed, set the current position to 0
+    //
+    setCurrentPositionInSteps(0L);
 
-
-  //
-  // successfully homed, set the current position to 0
-  //
-  setCurrentPositionInSteps(0L);    
-
-  //
-  // restore original velocity
-  //
-  setSpeedInStepsPerSecond(originalDesiredSpeed_InStepsPerSecond);
-  return(true);
+    //
+    // restore original velocity
+    //
+    setSpeedInStepsPerSecond(originalDesiredSpeed_InStepsPerSecond);
+    return(true);
 }
 
 
@@ -771,10 +771,10 @@ bool SmallFlexyStepper::moveToHomeInSteps(long directionTowardHome,
 //
 void SmallFlexyStepper::moveRelativeInSteps(long distanceToMoveInSteps)
 {
-  setTargetPositionRelativeInSteps(distanceToMoveInSteps);
-  
-  while(!processMovement())
-    ;
+    setTargetPositionRelativeInSteps(distanceToMoveInSteps);
+
+    while (!processMovement())
+        ;
 }
 
 
@@ -787,7 +787,7 @@ void SmallFlexyStepper::moveRelativeInSteps(long distanceToMoveInSteps)
 //
 void SmallFlexyStepper::setTargetPositionRelativeInSteps(long distanceToMoveInSteps)
 {
-  setTargetPositionInSteps(currentPosition_InSteps + distanceToMoveInSteps);
+    setTargetPositionInSteps(currentPosition_InSteps + distanceToMoveInSteps);
 }
 
 
@@ -800,10 +800,10 @@ void SmallFlexyStepper::setTargetPositionRelativeInSteps(long distanceToMoveInSt
 //
 void SmallFlexyStepper::moveToPositionInSteps(long absolutePositionToMoveToInSteps)
 {
-  setTargetPositionInSteps(absolutePositionToMoveToInSteps);
-  
-  while(!processMovement())
-    ;
+    setTargetPositionInSteps(absolutePositionToMoveToInSteps);
+
+    while (!processMovement())
+        ;
 }
 
 
@@ -815,7 +815,7 @@ void SmallFlexyStepper::moveToPositionInSteps(long absolutePositionToMoveToInSte
 //
 void SmallFlexyStepper::setTargetPositionInSteps(long absolutePositionToMoveToInSteps)
 {
-  targetPosition_InSteps = absolutePositionToMoveToInSteps;
+    targetPosition_InSteps = absolutePositionToMoveToInSteps;
 }
 
 
@@ -828,19 +828,19 @@ void SmallFlexyStepper::setTargetPositionInSteps(long absolutePositionToMoveToIn
 //
 void SmallFlexyStepper::setTargetPositionToStop()
 {
-  long decelerationDistance_InSteps;
-  
-  //
-  // move the target position so that the motor will begin deceleration now
-  //
-  decelerationDistance_InSteps = (long) round(
-    5E11 / (acceleration_InStepsPerSecondPerSecond * currentStepPeriod_InUS * 
-    currentStepPeriod_InUS));
+    long decelerationDistance_InSteps;
 
-  if (directionOfMotion > 0)
-    setTargetPositionInSteps(currentPosition_InSteps + decelerationDistance_InSteps);
-  else
-    setTargetPositionInSteps(currentPosition_InSteps - decelerationDistance_InSteps);
+    //
+    // move the target position so that the motor will begin deceleration now
+    //
+    decelerationDistance_InSteps = (long)round(
+        5E11 / (acceleration_InStepsPerSecondPerSecond * currentStepPeriod_InUS *
+            currentStepPeriod_InUS));
+
+    if (directionOfMotion > 0)
+        setTargetPositionInSteps(currentPosition_InSteps + decelerationDistance_InSteps);
+    else
+        setTargetPositionInSteps(currentPosition_InSteps - decelerationDistance_InSteps);
 }
 
 void SmallFlexyStepper::deadStop()
@@ -855,106 +855,106 @@ void SmallFlexyStepper::deadStop()
 //           position yet
 //
 bool SmallFlexyStepper::processMovement(void)
-{ 
-  unsigned long currentTime_InUS;
-  unsigned long periodSinceLastStep_InUS;
-  long distanceToTarget_Signed;
+{
+    unsigned long currentTime_InUS;
+    unsigned long periodSinceLastStep_InUS;
+    long distanceToTarget_Signed;
 
-
-  //
-  // check if currently stopped
-  //
-  if (directionOfMotion == 0)
-  {
-    distanceToTarget_Signed = targetPosition_InSteps - currentPosition_InSteps;
 
     //
-    // check if target position in a positive direction
+    // check if currently stopped
     //
-    if (distanceToTarget_Signed > 0)
+    if (directionOfMotion == 0)
     {
-      directionOfMotion = 1;
-      nextStepPeriod_InUS = periodOfSlowestStep_InUS;
-      lastStepTime_InUS = micros(); 
-      return(false);
+        distanceToTarget_Signed = targetPosition_InSteps - currentPosition_InSteps;
+
+        //
+        // check if target position in a positive direction
+        //
+        if (distanceToTarget_Signed > 0)
+        {
+            directionOfMotion = 1;
+            nextStepPeriod_InUS = periodOfSlowestStep_InUS;
+            lastStepTime_InUS = micros();
+            return(false);
+        }
+
+        //
+        // check if target position in a negative direction
+        //
+        else if (distanceToTarget_Signed < 0)
+        {
+            directionOfMotion = -1;
+            nextStepPeriod_InUS = periodOfSlowestStep_InUS;
+            lastStepTime_InUS = micros();
+            return(false);
+        }
+
+        else
+            return(true);
     }
-    
+
+
     //
-    // check if target position in a negative direction
+    // determine how much time has elapsed since the last step (Note 1: this method   
+    // works even if the time has wrapped. Note 2: all variables must be unsigned)
     //
-    else if (distanceToTarget_Signed < 0)
+    currentTime_InUS = micros();
+    periodSinceLastStep_InUS = currentTime_InUS - lastStepTime_InUS;
+
+
+    //
+    // if it is not time for the next step, return
+    //
+    if (periodSinceLastStep_InUS < (unsigned long)nextStepPeriod_InUS)
+        return(false);
+
+
+    //
+    // execute the step on the rising edge
+    //
+    setNextFullStep();
+
+
+    //
+    // update the current position and speed
+    //
+    currentPosition_InSteps += directionOfMotion;
+    currentStepPeriod_InUS = nextStepPeriod_InUS;
+
+
+    //
+    // remember the time that this step occured
+    //
+    lastStepTime_InUS = currentTime_InUS;
+
+
+    //
+    // figure out how long before the next step
+    //
+    DeterminePeriodOfNextStep();
+
+
+
+    //
+    // check if the move has reached its final target position, return true if all 
+    // done
+    //
+    if (currentPosition_InSteps == targetPosition_InSteps)
     {
-      directionOfMotion = -1;
-      nextStepPeriod_InUS = periodOfSlowestStep_InUS;
-      lastStepTime_InUS = micros(); 
-      return(false);
+        //
+        // at final position, make sure the motor is not going too fast
+        //
+        if (nextStepPeriod_InUS >= minimumPeriodForAStoppedMotion)
+        {
+            currentStepPeriod_InUS = 0.0;
+            nextStepPeriod_InUS = 0.0;
+            directionOfMotion = 0;
+            return(true);
+        }
     }
-    
-    else
-      return(true);
-  }
-   
-    
-  //
-  // determine how much time has elapsed since the last step (Note 1: this method   
-  // works even if the time has wrapped. Note 2: all variables must be unsigned)
-  //
-  currentTime_InUS = micros();
-  periodSinceLastStep_InUS = currentTime_InUS - lastStepTime_InUS;
 
-
-  //
-  // if it is not time for the next step, return
-  //
-  if (periodSinceLastStep_InUS < (unsigned long) nextStepPeriod_InUS)
     return(false);
-  
-
-  //
-  // execute the step on the rising edge
-  //
-  setNextFullStep();
-    
-  
-  //
-  // update the current position and speed
-  //
-  currentPosition_InSteps += directionOfMotion;
-  currentStepPeriod_InUS = nextStepPeriod_InUS;
-
-
-  //
-  // remember the time that this step occured
-  //
-  lastStepTime_InUS = currentTime_InUS;
- 
- 
-  //
-  // figure out how long before the next step
-  //
-  DeterminePeriodOfNextStep();
- 
-
-
-  //
-  // check if the move has reached its final target position, return true if all 
-  // done
-  //
-  if (currentPosition_InSteps == targetPosition_InSteps)
-  {
-    //
-    // at final position, make sure the motor is not going too fast
-    //
-    if (nextStepPeriod_InUS >= minimumPeriodForAStoppedMotion) 
-    {
-      currentStepPeriod_InUS = 0.0;
-      nextStepPeriod_InUS = 0.0;
-      directionOfMotion = 0;
-      return(true);
-    }
-  }
-    
-  return(false);
 }
 
 void SmallFlexyStepper::setNextFullStep()
@@ -1015,15 +1015,15 @@ void SmallFlexyStepper::setNextFullStep()
 //
 float SmallFlexyStepper::getCurrentVelocityInStepsPerSecond()
 {
-  if (currentStepPeriod_InUS == 0.0)
-    return(0);
-  else
-  {
-    if (directionOfMotion > 0)
-      return(1000000.0 / currentStepPeriod_InUS);
+    if (currentStepPeriod_InUS == 0.0)
+        return(0);
     else
-      return(-1000000.0 / currentStepPeriod_InUS);
-  }
+    {
+        if (directionOfMotion > 0)
+            return(1000000.0 / currentStepPeriod_InUS);
+        else
+            return(-1000000.0 / currentStepPeriod_InUS);
+    }
 }
 
 
@@ -1034,11 +1034,11 @@ float SmallFlexyStepper::getCurrentVelocityInStepsPerSecond()
 //
 bool SmallFlexyStepper::motionComplete()
 {
-  if ((directionOfMotion == 0) && 
-      (currentPosition_InSteps == targetPosition_InSteps))
-    return(true);
-  else
-    return(false);
+    if ((directionOfMotion == 0) &&
+        (currentPosition_InSteps == targetPosition_InSteps))
+        return(true);
+    else
+        return(false);
 }
 
 
@@ -1049,148 +1049,148 @@ bool SmallFlexyStepper::motionComplete()
 //
 void SmallFlexyStepper::DeterminePeriodOfNextStep()
 {
-  long distanceToTarget_Signed;
-  long distanceToTarget_Unsigned;
-  float currentSpeed_InStepsPerSecond;
-  long decelerationDistance_InSteps;
-  float currentStepPeriodSquared;
-  bool speedUpFlag = false;
-  bool slowDownFlag = false;
-  bool targetInPositiveDirectionFlag = false;
-  bool targetInNegativeDirectionFlag = false;
-
-  
-  //
-  // determine the distance to the target position
-  //
-  distanceToTarget_Signed = targetPosition_InSteps - currentPosition_InSteps;
-  if (distanceToTarget_Signed >= 0L)
-  {
-    distanceToTarget_Unsigned = distanceToTarget_Signed;
-    targetInPositiveDirectionFlag = true;
-  }
-  else
-  {
-    distanceToTarget_Unsigned = -distanceToTarget_Signed;
-    targetInNegativeDirectionFlag = true;
-  }
+    long distanceToTarget_Signed;
+    long distanceToTarget_Unsigned;
+    float currentSpeed_InStepsPerSecond;
+    long decelerationDistance_InSteps;
+    float currentStepPeriodSquared;
+    bool speedUpFlag = false;
+    bool slowDownFlag = false;
+    bool targetInPositiveDirectionFlag = false;
+    bool targetInNegativeDirectionFlag = false;
 
 
-  //
-  // determine the number of steps needed to go from the current speed down to a 
-  // velocity of 0, Steps = Velocity^2 / (2 * Acceleration)
-  //
-  currentStepPeriodSquared = currentStepPeriod_InUS * currentStepPeriod_InUS;
-  decelerationDistance_InSteps = (long) round(
-    5E11 / (acceleration_InStepsPerSecondPerSecond * currentStepPeriodSquared));
-  
-  
-  //
-  // check if: Moving in a positive direction & Moving toward the target
-  //    (directionOfMotion == 1) && (distanceToTarget_Signed > 0)
-  //
-  if ((directionOfMotion == 1) && (targetInPositiveDirectionFlag))
-  {
     //
-    // check if need to start slowing down as we reach the target, or if we 
-    // need to slow down because we are going too fast
+    // determine the distance to the target position
     //
-    if ((distanceToTarget_Unsigned < decelerationDistance_InSteps) || 
-        (nextStepPeriod_InUS < desiredPeriod_InUSPerStep))
-      slowDownFlag = true;
-    else 
-      speedUpFlag = true;
-   }
-
-
-  //
-  // check if: Moving in a positive direction & Moving away from the target
-  //    (directionOfMotion == 1) && (distanceToTarget_Signed < 0)
-  //
-  else if ((directionOfMotion == 1) && (targetInNegativeDirectionFlag))
-  {
-    //
-    // need to slow down, then reverse direction
-    //
-    if (currentStepPeriod_InUS < periodOfSlowestStep_InUS)
+    distanceToTarget_Signed = targetPosition_InSteps - currentPosition_InSteps;
+    if (distanceToTarget_Signed >= 0L)
     {
-      slowDownFlag = true;
+        distanceToTarget_Unsigned = distanceToTarget_Signed;
+        targetInPositiveDirectionFlag = true;
     }
     else
     {
-      directionOfMotion = -1;
+        distanceToTarget_Unsigned = -distanceToTarget_Signed;
+        targetInNegativeDirectionFlag = true;
     }
-  }
 
 
-  //
-  // check if: Moving in a negative direction & Moving toward the target
-  //    (directionOfMotion == -1) && (distanceToTarget_Signed < 0)
-  //
-  else if ((directionOfMotion == -1) && (targetInNegativeDirectionFlag))
-  {
     //
-    // check if need to start slowing down as we reach the target, or if we 
-    // need to slow down because we are going too fast
+    // determine the number of steps needed to go from the current speed down to a 
+    // velocity of 0, Steps = Velocity^2 / (2 * Acceleration)
     //
-    if ((distanceToTarget_Unsigned < decelerationDistance_InSteps) || 
-        (nextStepPeriod_InUS < desiredPeriod_InUSPerStep))
-      slowDownFlag = true;
-    else 
-      speedUpFlag = true;
-   }
+    currentStepPeriodSquared = currentStepPeriod_InUS * currentStepPeriod_InUS;
+    decelerationDistance_InSteps = (long)round(
+        5E11 / (acceleration_InStepsPerSecondPerSecond * currentStepPeriodSquared));
 
 
-  //
-  // check if: Moving in a negative direction & Moving away from the target
-  //    (directionOfMotion == -1) && (distanceToTarget_Signed > 0)
-  //
-  else if ((directionOfMotion == -1) && (targetInPositiveDirectionFlag))
-  {
     //
-    // need to slow down, then reverse direction
+    // check if: Moving in a positive direction & Moving toward the target
+    //    (directionOfMotion == 1) && (distanceToTarget_Signed > 0)
     //
-    if (currentStepPeriod_InUS < periodOfSlowestStep_InUS)
+    if ((directionOfMotion == 1) && (targetInPositiveDirectionFlag))
     {
-      slowDownFlag = true;
+        //
+        // check if need to start slowing down as we reach the target, or if we 
+        // need to slow down because we are going too fast
+        //
+        if ((distanceToTarget_Unsigned < decelerationDistance_InSteps) ||
+            (nextStepPeriod_InUS < desiredPeriod_InUSPerStep))
+            slowDownFlag = true;
+        else
+            speedUpFlag = true;
     }
-    else
+
+
+    //
+    // check if: Moving in a positive direction & Moving away from the target
+    //    (directionOfMotion == 1) && (distanceToTarget_Signed < 0)
+    //
+    else if ((directionOfMotion == 1) && (targetInNegativeDirectionFlag))
     {
-      directionOfMotion = 1;
+        //
+        // need to slow down, then reverse direction
+        //
+        if (currentStepPeriod_InUS < periodOfSlowestStep_InUS)
+        {
+            slowDownFlag = true;
+        }
+        else
+        {
+            directionOfMotion = -1;
+        }
     }
-  }
 
 
-  //
-  // check if accelerating
-  //
-  if (speedUpFlag)
-  {
     //
-    // StepPeriod = StepPeriod(1 - a * StepPeriod^2)
+    // check if: Moving in a negative direction & Moving toward the target
+    //    (directionOfMotion == -1) && (distanceToTarget_Signed < 0)
     //
-    nextStepPeriod_InUS = currentStepPeriod_InUS - acceleration_InStepsPerUSPerUS * 
-      currentStepPeriodSquared * currentStepPeriod_InUS;
+    else if ((directionOfMotion == -1) && (targetInNegativeDirectionFlag))
+    {
+        //
+        // check if need to start slowing down as we reach the target, or if we 
+        // need to slow down because we are going too fast
+        //
+        if ((distanceToTarget_Unsigned < decelerationDistance_InSteps) ||
+            (nextStepPeriod_InUS < desiredPeriod_InUSPerStep))
+            slowDownFlag = true;
+        else
+            speedUpFlag = true;
+    }
 
-    if (nextStepPeriod_InUS < desiredPeriod_InUSPerStep)
-      nextStepPeriod_InUS = desiredPeriod_InUSPerStep;
-  }
 
-  
-  //
-  // check if decelerating
-  //
-  if (slowDownFlag)
-  {
     //
-    // StepPeriod = StepPeriod(1 + a * StepPeriod^2)
+    // check if: Moving in a negative direction & Moving away from the target
+    //    (directionOfMotion == -1) && (distanceToTarget_Signed > 0)
     //
-    nextStepPeriod_InUS = currentStepPeriod_InUS + acceleration_InStepsPerUSPerUS * 
-      currentStepPeriodSquared * currentStepPeriod_InUS;
+    else if ((directionOfMotion == -1) && (targetInPositiveDirectionFlag))
+    {
+        //
+        // need to slow down, then reverse direction
+        //
+        if (currentStepPeriod_InUS < periodOfSlowestStep_InUS)
+        {
+            slowDownFlag = true;
+        }
+        else
+        {
+            directionOfMotion = 1;
+        }
+    }
 
-    if (nextStepPeriod_InUS > periodOfSlowestStep_InUS)
-      nextStepPeriod_InUS = periodOfSlowestStep_InUS;
-  }
+
+    //
+    // check if accelerating
+    //
+    if (speedUpFlag)
+    {
+        //
+        // StepPeriod = StepPeriod(1 - a * StepPeriod^2)
+        //
+        nextStepPeriod_InUS = currentStepPeriod_InUS - acceleration_InStepsPerUSPerUS *
+            currentStepPeriodSquared * currentStepPeriod_InUS;
+
+        if (nextStepPeriod_InUS < desiredPeriod_InUSPerStep)
+            nextStepPeriod_InUS = desiredPeriod_InUSPerStep;
+    }
+
+
+    //
+    // check if decelerating
+    //
+    if (slowDownFlag)
+    {
+        //
+        // StepPeriod = StepPeriod(1 + a * StepPeriod^2)
+        //
+        nextStepPeriod_InUS = currentStepPeriod_InUS + acceleration_InStepsPerUSPerUS *
+            currentStepPeriodSquared * currentStepPeriod_InUS;
+
+        if (nextStepPeriod_InUS > periodOfSlowestStep_InUS)
+            nextStepPeriod_InUS = periodOfSlowestStep_InUS;
+    }
 }
 
 //
@@ -1207,4 +1207,3 @@ void SmallFlexyStepper::disable()
 }
 
 // -------------------------------------- End --------------------------------------
-

@@ -2,9 +2,8 @@
 
 bool CraneController::StartUp()
 {
-	_muxBucketDistance = portMUX_INITIALIZER_UNLOCKED;
 	_muxBucketOpenClose = portMUX_INITIALIZER_UNLOCKED;
-
+	
 	_dolly.Init(DOLLY_STEPPER_PIN_1, DOLLY_STEPPER_PIN_2, DOLLY_STEPPER_PIN_3, DOLLY_STEPPER_PIN_4);
 	_dolly.ConnectToLimitSwitch(DOLLY_LIMIT_SWITCH_PIN);
 	_dolly.SetStepsPerMM(DOLLY_STEPS_PER_MM);
@@ -36,7 +35,7 @@ bool CraneController::CalibrateBucket()
 {
 	Serial.println("\n\n--Bucket Calibartion\n");
 	//while (!_bucketConnected) {
-	if (!WaitforBucketConnect()){
+	if (!WaitforBucketConnect()) {
 		return false;
 	}
 	//}
@@ -45,79 +44,31 @@ bool CraneController::CalibrateBucket()
 	OpenBucket();
 	CloseBucket();
 
-	if (!GetBucketDistance())
-	{
-		Serial.println("CalibrateBucket(): Failed to get bucket distance.");
-		return false;
-	}
-	int distanceToMove = 80 - _bucketDistance;
-	Serial.printf("Moving bucket %i mm\n", distanceToMove);
-	if (distanceToMove > 0) {
-		_ropebarrel.DropBucket(distanceToMove);
-	}
-	else {
-		_ropebarrel.RaiseBucket(distanceToMove * -1);
-	}
-
-	while (_ropebarrel.IsBucketInMotion())
-	{
-		_ropebarrel.Process();
-		vTaskDelay(1);
-	}
-
-	delay(1000);
-
-	if (!GetBucketDistance())
-	{
-		Serial.println("CalibrateBucket(): Failed to get bucket distance After Move.");
-		return false;
-	}
-	//Serial.printf("Bucket distance is: '%i'\n\n\n--------\n", _bucketDistance);
-
-	distanceToMove = 30 - _bucketDistance;
-	Serial.printf("Moving bucket %i mm\n", distanceToMove);
-	if (distanceToMove > 0) {
-		_ropebarrel.DropBucket(distanceToMove);
-	}
-	else {
-		_ropebarrel.RaiseBucket(distanceToMove * -1);
-	}
-
-	while (_ropebarrel.IsBucketInMotion())
-	{
-		_ropebarrel.Process();
-		vTaskDelay(1);
-	}
-
-	delay(1000);
-
-	if (!GetBucketDistance())
-	{
-		Serial.println("CalibrateBucket(): Failed to get bucket distance After Move.");
-		return false;
-	}
-	_ropebarrel.SetBucketHomeAsCurrent();
-
-	return true;
+	return _ropebarrel.Calibrate();
 }
 
 bool CraneController::CalibrateAll()
 {
+	Serial.println("Calibrating bucket");
 	CalibrateBucket();
-
-	if (!_dolly.Calibrate())
+	
+	Serial.println("Calibrating dolly");
+	if (!_dolly.Calibrate(DOLLY_CALIBRATION_SPEED))
 	{
 		return false;
 	}
 
-	if (!_tower.Calibrate())
+	Serial.println("Calibrating tower");
+	if (!_tower.Calibrate(TOWER_CALIBRATION_SPEED))
 	{
 		return false;
 	}
 
 	_tower.DisableStepper();
 	_dolly.DisableStepper();
+	_ropebarrel.Disable();
 
+	Serial.println("Ending Calibration");
 	return true;
 }
 
@@ -141,27 +92,6 @@ bool CraneController::WaitforBucketConnect()
 	return true;
 }
 
-bool CraneController::GetBucketDistance()
-{
-	_bucketDistance = BUCKET_NO_DISTANCE;
-	SendCommand(CC_GET_DISTANCE);
-
-	// wait for distance to be updated
-	unsigned long endWait = millis() + BUCKET_COMMAND_WAIT_TIME;
-	while (millis() < endWait) {
-		portENTER_CRITICAL(&_muxBucketDistance);
-		uint32_t distance = _bucketDistance;
-		portEXIT_CRITICAL(&_muxBucketDistance);
-		
-		if(distance != BUCKET_NO_DISTANCE)
-		{
-			Serial.printf("Bucket distance is: '%i'\n", distance);
-			return true;
-		}
-		vTaskDelay(5);
-	}
-	return false;
-}
 
 bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed, bool async)
 {
@@ -284,9 +214,7 @@ void CraneController::RunQueueHandler()
 				_bucketHeartbeatsWaiting = 0;
 				break;
 			case CC_BUCKET_DISTANCE:
-				portENTER_CRITICAL(&_muxBucketDistance);
-				_bucketDistance = currentMessage.distance;
-				portEXIT_CRITICAL(&_muxBucketDistance);
+				_ropebarrel.SetBucketDistance(currentMessage.distance);
 				break;
 			case CC_BUCKET_MOVE_COMPLETE:
 				portENTER_CRITICAL(&_muxBucketOpenClose);
