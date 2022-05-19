@@ -24,7 +24,7 @@ public:
 	RopeBarrellStepper();
 	bool Init();
 	void SetBucketDistance(uint16_t distance);
-	void Process();
+	void Process() { _stepper.Process(); }
 
 	void StopBucket();
 	bool IsInMotion() { return _stepper.IsInMotion(); }

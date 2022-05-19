@@ -111,10 +111,10 @@ bool RopeBarrellStepper::Calibrate()
 }
 
 
+	/*
 void RopeBarrellStepper::Process()
 {
 	_stepper.Process();
-	/*
 	if (IsBucketInMotion())
 	{
 		if (_stepper->getStepsLeft() != 0)
@@ -134,8 +134,8 @@ void RopeBarrellStepper::Process()
 			SetBucketMotionStatus(false);
 		}
 	}
-	*/
 }
+	*/
 
 /*
 void RopeBarrellStepper::SetBucketMotionStatus(bool status)

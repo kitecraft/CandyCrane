@@ -21,13 +21,13 @@ bool CraneController::StartUp()
 
 	_ropebarrel.Init();
 	
-	
+	/*
 	if (!CalibrateAll())
 	{
 		Serial.println("CraneController::StartUp() - Failed to calibrate");
 		return false;
 	}
-	
+	*/
 	return true;
 }
 
