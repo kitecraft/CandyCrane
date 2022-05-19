@@ -2,9 +2,7 @@
 #include <Arduino.h>
 #include "../CC_Config.h"
 #include "../Utilities/IncomeingMessageQueue.h"
-//#include "DollyStepper.h"
 #include "RopeBarrellStepper.h"
-//#include "TowerStepper.h"
 #include "../Utilities/CraneStepper.h"
 
 
@@ -28,8 +26,6 @@ private:
 	bool SendBucketHeartbeat();
 
 	RopeBarrellStepper _ropebarrel;
-	//DollyStepper _dolly;
-	//TowerStepper _tower;
 	CraneStepper _dolly;
 	CraneStepper _tower;
 
@@ -47,12 +43,11 @@ public:
 	bool GetAutoCraneStatus() { return _CraneInAutoMode; }
 
 	bool CalibrateAll();
-	//bool CalibrateDolly() { return  _dolly.Calibrate(); }
 	void StopAll() { StopDolly(); StopTowerMotion(); StopBucketMotion(); _CraneInAutoMode = false; }
 	void DisableAll() { _dolly.DisableStepper(); _tower.DisableStepper(); _ropebarrel.Disable(); }
 
 	void MoveDollyOutwards() { _dolly.MoveOut(); }
-	void MoveDollyInwards() { _dolly.MoveIn(); }
+	void MoveDollyInwards() { _dolly.MoveToMM(5); }// { _dolly.MoveIn(); }
 	void MoveDollyTo(int mmFromHome) { _dolly.MoveToMM(mmFromHome); }
 	void StopDolly() { _dolly.DeadStop(); }
 	bool IsDollyInMotion() { return _dolly.IsInMotion(); }
@@ -64,7 +59,7 @@ public:
 	bool IsBucketInMotion() { return _ropebarrel.IsInMotion(); }
 
 	void MoveTowerOutwards() { _tower.MoveOut(); }
-	void MoveTowerInwards() { _tower.MoveIn(); }
+	void MoveTowerInwards() { _tower.MoveToMM(5); }// { _tower.MoveIn(); }
 	void MoveTowerTo(int mmFromHome) { _tower.MoveToMM(mmFromHome); }
 	void StopTowerMotion() { _tower.DeadStop(); }
 	bool IsTowerInMotion() { return _tower.IsInMotion(); }

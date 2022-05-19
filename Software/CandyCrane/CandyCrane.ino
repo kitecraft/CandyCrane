@@ -38,9 +38,6 @@ void IRAM_ATTR CCComsThread(void*)
     while (true) {
         if (Serial2.available()) {
             String line = Serial2.readStringUntil('\n');
-            //Serial.print("Got line: '");
-            //Serial.print(line);
-            //Serial.println("'");
             g_incomeingMessageQueue.AddItemToQueue(EspNowMessageFromCsvString(line));
         }
         vTaskDelay(1);
@@ -89,11 +86,41 @@ void setup() {
 }
 
 
+#define DIR_OUT true
+#define DIR_IN false
+bool dollyDirection = DIR_OUT;
+bool towerDirection = DIR_OUT;
+
 void loop() {
     if (g_craneController.GetAutoCraneStatus()) {
         //Serial.printf("Crane is in auto mode: %i\n", g_AutoCraneCurrentStep);
         g_AutoCraneStepList[g_AutoCraneCurrentStep]();
     }
+
+    if (!g_craneController.IsDollyInMotion())
+    {
+        if (dollyDirection == DIR_OUT) {
+            g_craneController.MoveDollyOutwards();
+        }
+        else {
+            g_craneController.MoveDollyInwards();
+        }
+        dollyDirection = !dollyDirection;
+    }
+
+    /*
+    if (!g_craneController.IsTowerInMotion())
+    {
+        if (towerDirection == DIR_OUT) {
+            g_craneController.MoveTowerOutwards();
+        }
+        else {
+            g_craneController.MoveTowerInwards();
+        }
+        towerDirection = !towerDirection;
+    }
+    */
+    
 }
 
 

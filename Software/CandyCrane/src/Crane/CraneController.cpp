@@ -21,24 +21,20 @@ bool CraneController::StartUp()
 
 	_ropebarrel.Init();
 	
-	/*
 	if (!CalibrateAll())
 	{
 		Serial.println("CraneController::StartUp() - Failed to calibrate");
 		return false;
 	}
-	*/
 	return true;
 }
 
 bool CraneController::CalibrateBucket()
 {
 	Serial.println("\n\n--Bucket Calibartion\n");
-	//while (!_bucketConnected) {
 	if (!WaitforBucketConnect()) {
 		return false;
 	}
-	//}
 
 	CloseBucket();
 	OpenBucket();
@@ -145,15 +141,8 @@ void CraneController::Run()
 		return;
 	}
 
-	//StartUp();
 	int counter = 0;
 	while (true) {
-		
-
-		//GetBucketDistance();
-		//Serial.printf("%i Bucket distance is: '%i'\n", counter, _bucketDistance);
-		//vTaskDelay(1000);
-
 		
 		_dolly.Process();
 		_ropebarrel.Process();
@@ -167,37 +156,6 @@ void CraneController::Run()
 		}
 		*/
 
-		/*
-		counter++;
-		
-		if (_nextMove < millis())
-		{
-			if (_bucketState)
-			{
-				GetBucketDistance();
-				Serial.printf("%i Bucket distance is: '%i'\n", counter, _bucketDistance);
-
-				Serial.println("Closing the bucket, dear Liza, dear Liza");
-				if (CloseBucket()) {
-					Serial.println("Bucket has been closed");
-				}
-				else {
-					Serial.println("Failed to close bucket");
-				}
-			}
-			else {
-				Serial.println("Opening the bucket, dear Liza, dear Liza");
-				if (OpenBucket()) {
-					Serial.println("Bucket has been opened");
-				}
-				else {
-					Serial.println("Failed to open bucket");
-				}
-			}
-			_bucketState = !_bucketState;
-			_nextMove = millis() + 5000;
-		}
-		*/
 		vTaskDelay(1);
 	}
 }
