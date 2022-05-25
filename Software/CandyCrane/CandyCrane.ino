@@ -97,6 +97,8 @@ void loop() {
         //Serial.printf("Crane is in auto mode: %i\n", g_AutoCraneCurrentStep);
         g_AutoCraneStepList[g_AutoCraneCurrentStep]();
     }
+
+    /*
     else {
         if (currentAutoMode) {
             StartAutoCrane_CandyA();
@@ -106,7 +108,10 @@ void loop() {
         }
         currentAutoMode = !currentAutoMode;
     }
+    */
 
+
+    /*
     if (!g_craneController.IsDollyInMotion())
     {
         if (dollyDirection == DIR_OUT) {
@@ -118,7 +123,6 @@ void loop() {
         dollyDirection = !dollyDirection;
     }
 
-    /*
     if (!g_craneController.IsTowerInMotion())
     {
         if (towerDirection == DIR_OUT) {
