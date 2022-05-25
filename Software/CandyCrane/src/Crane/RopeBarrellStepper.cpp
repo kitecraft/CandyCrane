@@ -62,6 +62,7 @@ bool RopeBarrellStepper::Calibrate()
 		return false;
 	}
 
+
 	while (_bucketDistance < 60) {
 		_stepper.MoveOutMM(20);
 		while (_stepper.IsInMotion())

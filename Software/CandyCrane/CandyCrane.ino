@@ -88,6 +88,7 @@ void setup() {
 
 #define DIR_OUT true
 #define DIR_IN false
+bool currentAutoMode = true;
 bool dollyDirection = DIR_OUT;
 bool towerDirection = DIR_OUT;
 
@@ -95,6 +96,15 @@ void loop() {
     if (g_craneController.GetAutoCraneStatus()) {
         //Serial.printf("Crane is in auto mode: %i\n", g_AutoCraneCurrentStep);
         g_AutoCraneStepList[g_AutoCraneCurrentStep]();
+    }
+    else {
+        if (currentAutoMode) {
+            StartAutoCrane_CandyA();
+        }
+        else {
+            StartAutoCrane_CandyB();
+        }
+        currentAutoMode = !currentAutoMode;
     }
 
     if (!g_craneController.IsDollyInMotion())

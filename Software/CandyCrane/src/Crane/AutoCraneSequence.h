@@ -20,7 +20,7 @@ static void StartAutoCrane(int candyOption)
     }
 
     g_AutoCraneCurrentStep = 0;
-    g_craneController.MoveDollyTo(220);
+    g_craneController.MoveDollyTo(190);
     vTaskDelay(3000);
     g_craneController.MoveTowerTo(moveTo);
     g_craneController.SetAutoCraneStatus(true);
@@ -41,7 +41,7 @@ static void AutoCrane_Step1()
 {
     if (!g_craneController.IsDollyInMotion() && !g_craneController.IsTowerInMotion())
     {
-        g_craneController.MoveBucketTo(145);
+        g_craneController.MoveBucketTo(158);
         vTaskDelay(2000);
         g_craneController.OpenBucketAsync();
         g_AutoCraneCurrentStep++;
@@ -54,7 +54,7 @@ static void autoCrane_Step2()
     {
         g_craneController.CloseBucketAsync();
         vTaskDelay(750);
-        g_craneController.MoveBucketTo(40);
+        g_craneController.MoveBucketTo(20);
         g_AutoCraneCurrentStep++;
     }
 }
@@ -83,7 +83,7 @@ static void autoCrane_Step5()
     if (!g_craneController.IsBucketInMotion())
     {
         g_craneController.OpenBucket();
-        g_craneController.MoveBucketTo(50);
+        g_craneController.MoveBucketTo(30);
         g_AutoCraneCurrentStep++;
     }
 }
@@ -94,7 +94,7 @@ static void autoCrane_Step6()
     {
         g_craneController.MoveTowerTo(0);
         g_craneController.MoveDollyTo(0);
-        vTaskDelay(3000);
+        g_craneController.MoveBucketTo(0);
         g_craneController.CloseBucketAsync();
         g_AutoCraneCurrentStep++;
     }
@@ -104,7 +104,7 @@ static void autoCrane_Step7()
 {
     if (!g_craneController.IsTowerInMotion() && !g_craneController.IsDollyInMotion())
     {
-        g_craneController.CalibrateAll();
+        //g_craneController.CalibrateAll();
         g_craneController.SetAutoCraneStatus(false);
         g_AutoCraneCurrentStep == -1;
     }

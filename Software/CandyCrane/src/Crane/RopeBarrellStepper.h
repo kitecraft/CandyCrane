@@ -22,8 +22,8 @@ public:
 	void StopBucket() { _stepper.DeadStop(); }
 	bool IsInMotion() { return _stepper.IsInMotion(); }
 
-	void DropBucket() { _stepper.MoveOut(); }
-	void RaiseBucket() { _stepper.MoveIn(); }
+	void DropBucket() { _stepper.MoveOutMM(30); }  //{ _stepper.MoveOut(); }
+	void RaiseBucket() { _stepper.MoveInMM(30); } //{ _stepper.MoveIn(); }
 	void MoveBucketTo(int mmFromHome) { _stepper.MoveToMM(mmFromHome); }
 
 	bool Calibrate();

@@ -47,7 +47,7 @@ public:
 	void DisableAll() { _dolly.DisableStepper(); _tower.DisableStepper(); _ropebarrel.Disable(); }
 
 	void MoveDollyOutwards() { _dolly.MoveOut(); }
-	void MoveDollyInwards() { _dolly.MoveToMM(5); }// { _dolly.MoveIn(); }
+	void MoveDollyInwards(){ _dolly.MoveIn(); }
 	void MoveDollyTo(int mmFromHome) { _dolly.MoveToMM(mmFromHome); }
 	void StopDolly() { _dolly.DeadStop(); }
 	bool IsDollyInMotion() { return _dolly.IsInMotion(); }
@@ -59,8 +59,8 @@ public:
 	bool IsBucketInMotion() { return _ropebarrel.IsInMotion(); }
 
 	void MoveTowerOutwards() { _tower.MoveOut(); }
-	void MoveTowerInwards() { _tower.MoveToMM(5); }// { _tower.MoveIn(); }
-	void MoveTowerTo(int mmFromHome) { _tower.MoveToMM(mmFromHome); }
+	void MoveTowerInwards() { _tower.MoveIn(); }
+	void MoveTowerTo(float mmFromHome) { _tower.MoveToMM(mmFromHome); }
 	void StopTowerMotion() { _tower.DeadStop(); }
 	bool IsTowerInMotion() { return _tower.IsInMotion(); }
 
