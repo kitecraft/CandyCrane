@@ -6,8 +6,6 @@
 #include "../Utilities/CraneStepper.h"
 #include "CandyRanger.h"
 
-#include <ServoEasing.hpp>
-
 extern IncomeingMessageQueue g_incomeingMessageQueue;
 
 class CraneController
