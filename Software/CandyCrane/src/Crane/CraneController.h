@@ -4,7 +4,9 @@
 #include "../Utilities/IncomeingMessageQueue.h"
 #include "RopeBarrellStepper.h"
 #include "../Utilities/CraneStepper.h"
+#include "CandyRanger.h"
 
+#include <ServoEasing.hpp>
 
 extern IncomeingMessageQueue g_incomeingMessageQueue;
 
@@ -30,6 +32,8 @@ private:
 	CraneStepper _tower;
 
 	bool CalibrateBucket();
+
+	CandyRanger _candyRanger;
 
 	/* stuff for testing, remove later or else....*/
 	unsigned long _nextMove = 0;
