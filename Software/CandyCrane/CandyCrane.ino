@@ -3,6 +3,7 @@
  Created:	3/26/2022 12:17:55 PM
  Author:	Kitecraft
 */
+#include <ServoEasing.h>
 #include <Arduino.h>
 #include "src/Utilities/Network.h"
 #include "src/Utilities/CCWebServer.h"
