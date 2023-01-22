@@ -8,7 +8,7 @@ static bool connectToNetwork()
 {
     WiFi.hostname(__DEVICE_NAME__);
     WiFi.mode(WIFI_STA);
-    //SetSsid("");
+    //SetSsid("Starside");
     //SetSsidPassword("");
 
     if (GetSsid().equals(""))
@@ -29,6 +29,8 @@ static bool connectToNetwork()
             if (WiFi.status() == WL_CONNECTED) {
                 Serial.print("Connected to network: " + GetSsid() + " - ");
                 Serial.println(WiFi.localIP());
+                Serial.print("Channel: ");
+                Serial.println(WiFi.channel());
                 return true;
             }
             delay(500);

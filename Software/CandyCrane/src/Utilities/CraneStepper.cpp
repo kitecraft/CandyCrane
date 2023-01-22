@@ -5,10 +5,10 @@ CraneStepper::CraneStepper()
 
 }
 
-void CraneStepper::Init(byte stepperPin1, byte stepperPin2, byte stepperPin3, byte stepperPin4)
+void CraneStepper::Init(MtsStepper* stepper)
 {
 	_muxMotion = portMUX_INITIALIZER_UNLOCKED;
-	_stepper.connectToPins(stepperPin1, stepperPin2, stepperPin3, stepperPin4);
+	_stepper = stepper;
 }
 
 void CraneStepper::ConnectToLimitSwitch(byte pinNumber)
@@ -36,7 +36,7 @@ bool CraneStepper::IsInMotion()
 
 STEPPER_MOVE_ERROR CraneStepper::IsMaximumLimitReached()
 {
-	if (_stepper.getCurrentPositionInSteps() > GetMaximumStep())
+	if (_stepper->getCurrentPositionInSteps() > GetMaximumStep())
 	{
 		//Serial.println("Maximum Limit Reached");
 		return SME_MAXIMUM_TRAVEL_LIMIT_REACHED;
@@ -53,7 +53,7 @@ STEPPER_MOVE_ERROR CraneStepper::IsMiniumLimitReached()
 		}
 	}
 	else {
-		if (_stepper.getCurrentPositionInSteps() <= 0) {
+		if (_stepper->getCurrentPositionInSteps() <= 0) {
 			//Serial.println("Minimum Limit Reached");
 			return SME_MINIMUM_TRAVEL_LIMIT_REACHED;
 		}
@@ -63,17 +63,19 @@ STEPPER_MOVE_ERROR CraneStepper::IsMiniumLimitReached()
 
 bool CraneStepper::Calibrate(int stepsPerSec)
 {
+	/*
 	if (!_usingLimitSwitch) {
 		return false;
 	}
 
-	if (!_stepper.moveToHomeInSteps(DIRECTION_IN, stepsPerSec, GetMaximumStep() + 256, _limitSwitchPin))
+	if (!_stepper->moveToHomeInSteps(DIRECTION_IN, stepsPerSec, GetMaximumStep() + 256, _limitSwitchPin))
 	{
 		return false;
 	}
 
-	_stepper.moveRelativeInSteps(StepsForDistance(MM_FROM_SWITCH_FOR_HOME));
-	_stepper.setCurrentPositionInSteps(0);
+	_stepper->moveRelativeInSteps(StepsForDistance(MM_FROM_SWITCH_FOR_HOME));
+	_stepper->setCurrentPositionInSteps(0);
+	*/
 	return true;
 }
 
@@ -85,9 +87,9 @@ STEPPER_MOVE_ERROR CraneStepper::MoveOut()
 		return state;
 	}
 	_direction = DIRECTION_OUT;
-	_stepper.setTargetPositionInSteps(GetMaximumStep());
+	_stepper->setTargetPositionInSteps(GetMaximumStep());
 	SetMotionStatus(true);
-	//Serial.printf("Current: %i to: %i\n", _stepper.getCurrentPositionInSteps(), GetMaximumStep());
+	//Serial.printf("Current: %i to: %i\n", _stepper->getCurrentPositionInSteps(), GetMaximumStep());
 	return SME_NONE;
 }
 
@@ -99,7 +101,7 @@ STEPPER_MOVE_ERROR CraneStepper::MoveOutMM(float mmToMoveOutwards)
 	}
 	_direction = DIRECTION_OUT;
 	long steps = StepsForDistance(mmToMoveOutwards);
-	_stepper.setTargetPositionInSteps(_stepper.getCurrentPositionInSteps() + steps);
+	_stepper->setTargetPositionInSteps(_stepper->getCurrentPositionInSteps() + steps);
 	SetMotionStatus(true);
 	return SME_NONE;
 }
@@ -112,8 +114,8 @@ STEPPER_MOVE_ERROR CraneStepper::MoveIn()
 	}
 	_direction = DIRECTION_IN;
 	//Serial.println("Moving this inwards");
-	//Serial.printf("Current: %i to: %i\n", _stepper.getCurrentPositionInSteps(), 0);
-	_stepper.setTargetPositionInSteps(1);
+	//Serial.printf("Current: %i to: %i\n", _stepper->getCurrentPositionInSteps(), 0);
+	_stepper->setTargetPositionInSteps(1);
 	SetMotionStatus(true);
 	return SME_NONE;
 }
@@ -127,7 +129,7 @@ STEPPER_MOVE_ERROR CraneStepper::MoveInMM(float mmToMoveInwards)
 	long steps = StepsForDistance(mmToMoveInwards);
 	_direction = DIRECTION_IN;
 	//Serial.printf("Moving in %i steps.\n", steps);
-	_stepper.setTargetPositionInSteps(_stepper.getCurrentPositionInSteps() - steps);
+	_stepper->setTargetPositionInSteps(_stepper->getCurrentPositionInSteps() - steps);
 	SetMotionStatus(true);
 	return SME_NONE;
 }
@@ -136,7 +138,7 @@ STEPPER_MOVE_ERROR CraneStepper::MoveInMM(float mmToMoveInwards)
 STEPPER_MOVE_ERROR CraneStepper::MoveToMM(float mm)
 {
 	long stepToMoveTo = StepsForDistance(mm);
-	long numberStepsToMove = stepToMoveTo - _stepper.getCurrentPositionInSteps();
+	long numberStepsToMove = stepToMoveTo - _stepper->getCurrentPositionInSteps();
 	if (numberStepsToMove > 0){
 		STEPPER_MOVE_ERROR state = IsMaximumLimitReached();
 		if (state != SME_NONE) {
@@ -151,7 +153,7 @@ STEPPER_MOVE_ERROR CraneStepper::MoveToMM(float mm)
 		_direction = DIRECTION_IN;
 	}
 
-	_stepper.setTargetPositionInSteps(stepToMoveTo);
+	_stepper->setTargetPositionInSteps(stepToMoveTo);
 	SetMotionStatus(true);
 	return SME_NONE;
 }
@@ -163,7 +165,7 @@ STEPPER_MOVE_ERROR CraneStepper::Process()
 		if (_direction == DIRECTION_OUT) {
 			STEPPER_MOVE_ERROR state = IsMaximumLimitReached();
 			if (state != SME_NONE) {
-				_stepper.deadStop();
+				_stepper->deadStop();
 				SetMotionStatus(false);
 				return state;
 			}
@@ -171,20 +173,20 @@ STEPPER_MOVE_ERROR CraneStepper::Process()
 		else {
 			STEPPER_MOVE_ERROR state = IsMiniumLimitReached();
 			if (state != SME_NONE) {
-				_stepper.deadStop();
+				_stepper->deadStop();
 				SetMotionStatus(false);
-				//Serial.printf("Ending process due to minimium limit reached. Steps: %i\n", _stepper.getCurrentPositionInSteps());
+				//Serial.printf("Ending process due to minimium limit reached. Steps: %i\n", _stepper->getCurrentPositionInSteps());
 				
 				return state;
 			}
 		}
 
-		if (!_stepper.motionComplete())
+		if (!_stepper->motionComplete())
 		{
-			_stepper.processMovement();
+			_stepper->process();
 		}
 		else {
-			//Serial.printf("Motion is complete. Steps: %i\n", _stepper.getCurrentPositionInSteps());
+			//Serial.printf("Motion is complete. Steps: %i\n", _stepper->getCurrentPositionInSteps());
 			SetMotionStatus(false);
 		}
 	}

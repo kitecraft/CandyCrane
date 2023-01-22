@@ -37,16 +37,7 @@
     <ClInclude Include="src\Crane\CraneController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ESPNow\CandyCraneCommands.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ESPNow\EspNowMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Crane\RopeBarrellStepper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utilities\IncomeingMessageQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utilities\Network.h">
@@ -61,13 +52,28 @@
     <ClInclude Include="src\Crane\AutoCraneSequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\SmallFlexyStepper\SmallFlexyStepper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Utilities\CraneStepper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Crane\CandyRanger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MultiTinyStepper\MCP23017.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MultiTinyStepper\MtsStepper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MultiTinyStepper\MultiTinyStepper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MultiTinyStepper\MultiTinyStepper_Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Crane\QueueItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Crane\CandyCraneCommands.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -78,16 +84,19 @@
     <ClCompile Include="src\Crane\RopeBarrellStepper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utilities\IncomeingMessageQueue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SmallFlexyStepper\SmallFlexyStepper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utilities\CraneStepper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Crane\CandyRanger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MultiTinyStepper\MCP23017.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MultiTinyStepper\MtsStepper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MultiTinyStepper\MultiTinyStepper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

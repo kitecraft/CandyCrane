@@ -1,9 +1,12 @@
 #pragma once
 #include <Arduino.h>
-//#include <CheapStepper.h>
+#include "../MultiTinyStepper/MultiTinyStepper.h"
+#include "../MultiTinyStepper/MtsStepper.h"
 #include "../Utilities/CraneStepper.h"
 #include "../CC_Config.h"
 
+
+typedef std::function<void()> requestDistanceFunc;
 class RopeBarrellStepper
 {
 private:
@@ -11,12 +14,13 @@ private:
 	float _bucketDistance = BUCKET_NO_DISTANCE;
 	portMUX_TYPE _muxBucketDistance;
 	bool FetchBucketDistance();
+	requestDistanceFunc requestDistance = nullptr;
 
 
 public:
 	RopeBarrellStepper();
-	bool Init();
-	void SetBucketDistance(uint16_t distance);
+	bool Init(MtsStepper* stepper);
+	void SetBucketDistance(int distance);
 	void Process() { _stepper.Process(); }
 
 	void StopBucket() { _stepper.DeadStop(); }
@@ -28,5 +32,8 @@ public:
 
 	bool Calibrate();
 	void Disable() { _stepper.DisableStepper(); }
+
+
+	void setCallback(requestDistanceFunc fn) { requestDistance = fn; }
 };
 

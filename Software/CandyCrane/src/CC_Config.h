@@ -1,7 +1,10 @@
 #pragma once
+#include <esp_task.h>
 
 #define __DEVICE_NAME__ "CandyCrane"
 #define __DEVICE_VERSION__ "0.1"
+
+#define CC_BUCKET_MAC "84:CC:A8:83:D0:92"
 
 #define NETWORK_WAIT_TIME_PER_TRY 30 //seconds
 #define NETWORK_TRY_TIMES 3
@@ -75,7 +78,18 @@
 #define DEFAULT_BUCKET_OPEN_SPEED 60
 #define DEFAULT_BUCKET_CLOSE_SPEED 60
 
-#define CANDY_RANGER_SERVO_PIN 13
+#define CANDY_RANGER_SERVO_PIN 5
+#define CANDY_RANGER_DEFAULT_SPEED 40
+#define CANDY_RANGER_FAST_SPEED 55
+#define CANDY_RANGER_SCAN_SPEED  30
+
+#define CANDY_RANGER_HOME_POS 20
+#define CANDY_RANGER_ZONE_A_START 55
+#define CANDY_RANGER_ZONE_A_END 80
+#define CANDY_RANGER_ZONE_B_START 95
+#define CANDY_RANGER_ZONE_B_END 115
+
+#define CANDY_RANGER_NUM_SAMPLES 5
 
 #define WEBPAGE_NETWORK "/web/net.htm"
 #define WEBPAGE_ROOT "/web/root.htm"

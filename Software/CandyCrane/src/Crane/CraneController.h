@@ -1,30 +1,36 @@
 #pragma once
 #include <Arduino.h>
+#include <WiFiServer.h>
 #include "../CC_Config.h"
-#include "../Utilities/IncomeingMessageQueue.h"
 #include "RopeBarrellStepper.h"
+#include "../MultiTinyStepper/MultiTinyStepper.h"
 #include "../Utilities/CraneStepper.h"
 #include "CandyRanger.h"
+#include "CandyCraneCommands.h"
 
-extern IncomeingMessageQueue g_incomeingMessageQueue;
+static TaskHandle_t _tcpServerThreadHandle = nullptr;
 
 class CraneController
 {
 private:
-	bool _QueueHandlerRunning = false;
 	bool _CraneInAutoMode = false;
 
+	WiFiServer* _tcpServer = nullptr;
+	WiFiClient _bucketClient;
 	bool _bucketConnected = false;
 	bool _bucketOpenCloseComplete = false;
 	portMUX_TYPE _muxBucketOpenClose;
+	void SendMessageToBucket(CANDY_CRANE_COMMANDS command, int distance = 0, int angle = 0, int speed = 0);
+	void RequestDistance() { SendMessageToBucket(CC_GET_DISTANCE); }
+	void Ping();
+	uint32_t _lastPing = 0;
+	bool _pinged = false;
 
-	uint8_t _bucketHeartbeatsWaiting = 0;
-	unsigned long _nextHeartbeat = 0;
-
-	bool WaitforBucketConnect();
+	void WaitforBucketConnect();
 	bool OpenCloseBucket(int moveToAngle, int moveSpeed, bool async = false);
-	bool SendBucketHeartbeat();
+	void ParseMessage(String message);
 
+	MultiTinyStepper _stepperController;
 	RopeBarrellStepper _ropebarrel;
 	CraneStepper _dolly;
 	CraneStepper _tower;
@@ -40,7 +46,8 @@ private:
 public:
 	bool StartUp();
 	void Run();
-	void RunQueueHandler();
+	void RunTCPServer();
+
 	void SetAutoCraneStatus(bool status) { _CraneInAutoMode = status; }
 	bool GetAutoCraneStatus() { return _CraneInAutoMode; }
 

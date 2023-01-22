@@ -154,10 +154,10 @@ void IRAM_ATTR WebSeverThread(void*)
         });
 
     server.on("/commands/bucket/Open", [&]() {
+        Serial.println("Opening Bucket");
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
         if (!g_craneController.GetAutoCraneStatus())
             g_craneController.OpenBucket();
-        Serial.println("Opening Bucket");
         });
 
     server.on("/commands/bucket/Close", [&]() {
