@@ -92,7 +92,7 @@ void SendMessage(CANDY_CRANE_COMMANDS command, int distance = 0, int angle = 0, 
 }
 
 void loop() {
-    if (millis() - g_lastPing > 6000) {
+    if (millis() - g_lastPing > DEFAULT_BUCKET_PING_RATE) {
         Serial.println("Lost connection to crane");
         g_tcpClient.stop();
         g_connectedToCrane = false;

@@ -17,23 +17,26 @@ bool CraneController::StartUp()
 {
 	_muxBucketOpenClose = portMUX_INITIALIZER_UNLOCKED;
 
-	Wire.begin(4, 5, 1000000);
-	_stepperController.begin(Wire, MCP23017_DEFAULT_ADDR);
+	//Wire.begin(4, 5, 1000000);
+	_stepperController.begin(Wire, MULTITINYSTEPPER_RESET_PIN, MCP23017_DEFAULT_ADDR);
 	
-	_dolly.Init(_stepperController.getStepper(MTS_STEPPER_1)); _dolly.ConnectToLimitSwitch(DOLLY_LIMIT_SWITCH_PIN);
+	_dolly.Init(_stepperController.getStepper(MTS_STEPPER_3)); 
+	//_dolly.SetReversed(true);
+	_dolly.ConnectToLimitSwitch(DOLLY_LIMIT_SWITCH_PIN);
 	_dolly.SetStepsPerMM(DOLLY_STEPS_PER_MM);
 	_dolly.SetMaximumDistance(DOLLY_MAXIMUM_DISTANCE);
 	_dolly.SetSpeed(DOLLY_SPEED_STEPS_SECOND);
 	_dolly.SetAcceleration(DOLLY_ACCEL_STEPS_SECOND);
 
-	_tower.Init(_stepperController.getStepper(MTS_STEPPER_2));
+	_tower.Init(_stepperController.getStepper(MTS_STEPPER_1));
+	_tower.SetReversed(true);
 	_tower.ConnectToLimitSwitch(TOWER_LIMIT_SWITCH_PIN);
 	_tower.SetStepsPerMM(TOWER_STEPS_PER_MM);
 	_tower.SetMaximumDistance(TOWER_MAXIMUM_DISTANCE);
 	_tower.SetSpeed(TOWER_SPEED_STEPS_SECOND);
 	_tower.SetAcceleration(TOWER_ACCEL_STEPS_SECOND);
 
-	_ropebarrel.Init(_stepperController.getStepper(MTS_STEPPER_3));
+	_ropebarrel.Init(_stepperController.getStepper(MTS_STEPPER_2));
 	_ropebarrel.setCallback([this]() { RequestDistance(); });
 
 	_candyRanger.Init();
@@ -48,8 +51,6 @@ bool CraneController::StartUp()
 	
 	//CalibrateBucket();
 
-	return true;
-
 	/*
 	if (!CalibrateAll())
 	{
@@ -57,6 +58,8 @@ bool CraneController::StartUp()
 		return false;
 	}
 	*/
+
+	return true;
 
 }
 
@@ -73,6 +76,7 @@ bool CraneController::CalibrateBucket()
 
 bool CraneController::CalibrateAll()
 {
+	_stepperController.Reset();
 	Serial.println("Calibrating bucket");
 	CalibrateBucket();
 	
@@ -102,8 +106,7 @@ void CraneController::WaitforBucketConnect()
 	while (!_bucketConnected) {
 		WiFiClient client = _tcpServer->available();
 		if (client) {
-			bool waitForHello = true;
-			while (client.connected() && waitForHello) {
+			while (client.connected()) {
 				if (client.available()) {
 					String data;
 					while (client.available()) {
@@ -118,7 +121,6 @@ void CraneController::WaitforBucketConnect()
 						Serial.println(data);
 						_bucketClient = client;
 						_bucketConnected = true;
-						waitForHello = false;
 						return;
 					}
 				}
@@ -152,6 +154,16 @@ bool CraneController::OpenCloseBucket(int moveToAngle, int moveingSpeed, bool as
 	return false;
 }
 
+int CraneController::GetCandy1Measurement()
+{
+	return _candyRanger.GetDistanceForCandyA();
+}
+
+int CraneController::GetCandy2Measurement()
+{
+	return _candyRanger.GetDistanceForCandyB();
+}
+
 void CraneController::Run()
 {
 	bool bucketConnectionPreviousState = false;
@@ -161,15 +173,15 @@ void CraneController::Run()
 			CalibrateAll();
 			bucketConnectionPreviousState = _bucketConnected;
 		}
-		else if(!_bucketConnected) {
+		else if(!_bucketConnected && bucketConnectionPreviousState) {
 			bucketConnectionPreviousState = false;
 		}
-
+		
 		if (_bucketConnected) {
 			_dolly.Process();
 			_ropebarrel.Process();
 			_tower.Process();
-		}
+		} 
 		vTaskDelay(1);
 	}
 }
@@ -187,7 +199,7 @@ void CraneController::RunTCPServer()
 			WaitforBucketConnect();
 		}
 		else {
-			if (millis() - _lastPing > 5000) {
+			if (millis() - _lastPing > DEFAULT_BUCKET_PING_RATE) {
 				Ping();
 			}
 			if (_bucketConnected && _bucketClient.available()) {
@@ -201,9 +213,9 @@ void CraneController::RunTCPServer()
 
 void CraneController::ParseMessage(String message)
 {
-	Serial.print("Got: '");
-	Serial.print(message);
-	Serial.println("'");
+	//Serial.print("Got: '");
+	//Serial.print(message);
+	//Serial.println("'");
 
 	int command;
 	int distance;
@@ -215,7 +227,7 @@ void CraneController::ParseMessage(String message)
 	switch ((CANDY_CRANE_COMMANDS)command) {
 	case CC_PONG:
 		//Serial.println("Got Pong");
-		_pinged = false;
+		_pingCount = 0;
 		break;
 	case CC_BUCKET_DISTANCE:
 		Serial.printf("Setting the distance to: %d\n", distance);
@@ -241,23 +253,28 @@ void CraneController::ParseMessage(String message)
 
 void CraneController::Ping()
 {
-	if (_pinged) {
+	if (_pingCount >= DEFUALT_MAX_MISSED_PINGS) {
+		Serial.println("Bucket has gone offline");
 		_bucketClient.stop();
 		_bucketConnected = false;
-		_pinged = false;
+		_pingCount = 0;
 		Serial.println("Lost connection to bucket");
 		return;
 	}
-
+	//Serial.println("Pinging bucket");
 	_lastPing = millis();
-	_pinged = true;
+	_pingCount++;
 	SendMessageToBucket(CC_PING);
 }
 
 void CraneController::SendMessageToBucket(CANDY_CRANE_COMMANDS command, int distance, int angle, int speed)
 {
 	String message = String(command) + "," + String(distance) + "," + String(angle) + "," + String(speed);
-	Serial.print("Sending: ");
-	Serial.println(message);
+	
+	//if (command != CC_PING) {
+	//	Serial.print("Sending message: ");
+	//	Serial.println(message);
+	//}
+
 	_bucketClient.println(message);
 }

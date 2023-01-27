@@ -60,6 +60,7 @@ void IRAM_ATTR WebSeverThread(void*)
         server.send(200, "text/html", IceFS_ReadFile(WEBPAGE_CC_CONTROL));
         g_craneController.StopAll();
         g_craneController.DisableAll();
+        StopAutoCrane();
         Serial.println("Emergency Stop");
         });
 

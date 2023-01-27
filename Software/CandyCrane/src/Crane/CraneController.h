@@ -24,7 +24,7 @@ private:
 	void RequestDistance() { SendMessageToBucket(CC_GET_DISTANCE); }
 	void Ping();
 	uint32_t _lastPing = 0;
-	bool _pinged = false;
+	int _pingCount = 0;
 
 	void WaitforBucketConnect();
 	bool OpenCloseBucket(int moveToAngle, int moveSpeed, bool async = false);
@@ -77,5 +77,8 @@ public:
 	void OpenBucketAsync() { OpenCloseBucket(DEFAULT_BUCKET_OPEN_ANGLE, DEFAULT_BUCKET_OPEN_SPEED, true); }
 	bool CloseBucket() { return OpenCloseBucket(DEFAULT_BUCKET_CLOSED_ANGLE, DEFAULT_BUCKET_CLOSE_SPEED); }	
 	void CloseBucketAsync() { OpenCloseBucket(DEFAULT_BUCKET_CLOSED_ANGLE, DEFAULT_BUCKET_CLOSE_SPEED, true); }
+
+	int GetCandy1Measurement();
+	int GetCandy2Measurement();
 };
 

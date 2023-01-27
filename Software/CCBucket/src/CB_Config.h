@@ -11,6 +11,7 @@ String ssid = "Starside";
 #define DEFAULT_BUCKET_START_ANGLE 40
 #define DEFAULT_BUCKET_SPEED 60
 #define NUMBER_DISTANCE_SAMPLES 10.0
+#define DEFAULT_BUCKET_PING_RATE 15000 //15 sec - 10 for the ping rate, 5 for buffer
 
 
 int addr = 0;

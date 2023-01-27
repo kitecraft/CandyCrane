@@ -16,7 +16,8 @@ private:
 	VL53L0X _ranger;
 
 	int GetDistanceForCandy(CANDY_ID candyId);
-
+	bool InitRanger();
+	bool InitServo();
 public:
 	bool Init();
 	int GetDistanceForCandyA();

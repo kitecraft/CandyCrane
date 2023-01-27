@@ -219,7 +219,7 @@ void MtsStepper::deadStop()
 void MtsStepper::disable()
 {
     deadStop();
-    processStep(-1, _stepperType);
+    processStep(-1, _stepperType, _reversed);
 }
 
 //
@@ -451,7 +451,7 @@ void MtsStepper::setNextStep()
         }
     }
 
-    processStep(_stepPhase, _stepSize);
+    processStep(_stepPhase, _stepSize, _reversed);
 }
 
 void MtsStepper::DeterminePeriodOfNextStep()

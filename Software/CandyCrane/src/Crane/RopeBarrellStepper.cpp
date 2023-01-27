@@ -10,6 +10,7 @@ bool RopeBarrellStepper::Init(MtsStepper* stepper)
 	_muxBucketDistance = portMUX_INITIALIZER_UNLOCKED;
 
 	_stepper.Init(stepper);
+	_stepper.SetReversed(true);
 	_stepper.SetStepsPerMM(ROPE_BARREL_STEPS_PER_MM);
 	_stepper.SetMaximumDistance(ROPE_BARREL_MAXIMUM_DISTANCE);
 	_stepper.SetSpeed(ROPE_BARREL_SPEED_STEPS_SECOND);

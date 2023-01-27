@@ -4,14 +4,9 @@ void MCP23017::init(uint8_t address, TwoWire& bus)
 {
 	_deviceAddr = address;
 	_bus = &bus;
-	//BANK = 	0 : sequential register addresses
-	//MIRROR = 	0 : use configureInterrupt 
-	//SEQOP = 	1 : sequential operation disabled, address pointer does not increment
-	//DISSLW = 	0 : slew rate enabled
-	//HAEN = 	0 : hardware address pin is always enabled on 23017
-	//ODR = 	0 : open drain output
-	//INTPOL = 	0 : interrupt active low
 	writeRegister(MCP23017Register::IOCON, 0b00100000);
+	portMode(MCP23017Port::A, 0);
+	portMode(MCP23017Port::B, 0);
 
 	//enable all pull up resistors (will be effective for input pins only)
 	writeRegister(MCP23017Register::GPPU_A, 0xFF, 0xFF);

@@ -34,6 +34,8 @@ void setup() {
     Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
 
     Wire.begin();
+    Wire.setClock(700000);
+
     StartNetworkStuff();
     Serial.println(WiFi.macAddress());
 

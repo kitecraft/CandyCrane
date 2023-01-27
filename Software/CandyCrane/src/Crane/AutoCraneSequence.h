@@ -4,26 +4,37 @@
 
 extern CraneController g_craneController;
 static int g_AutoCraneCurrentStep = -1;
+static int g_candyDistance = -1;
 
+/*
+Take candy distance measurement
+Start dolly movement outwards
+Start tower movement outwards
+*/
 static void StartAutoCrane(int candyOption)
 {
+
     int moveTo = 0;
     if (candyOption == 1)
     {
         moveTo = 45;
+        g_candyDistance = g_craneController.GetCandy1Measurement();
+        
     }
     else if (candyOption == 2) {
         moveTo = 145;
+        g_candyDistance = g_craneController.GetCandy2Measurement();
     }
     else {
         return;
     }
+    g_craneController.SetAutoCraneStatus(true);
 
     g_AutoCraneCurrentStep = 0;
     g_craneController.MoveDollyTo(190);
     vTaskDelay(3000);
     g_craneController.MoveTowerTo(moveTo);
-    g_craneController.SetAutoCraneStatus(true);
+
 }
 
 static void StartAutoCrane_CandyA()
@@ -107,5 +118,11 @@ static void autoCrane_Step7()
         //g_craneController.CalibrateAll();
         g_craneController.SetAutoCraneStatus(false);
         g_AutoCraneCurrentStep == -1;
+        Serial.println("Sequence Complete");
     }
+}
+
+static void StopAutoCrane(){
+    g_craneController.SetAutoCraneStatus(false);
+    g_AutoCraneCurrentStep == -1;
 }

@@ -25,6 +25,7 @@ private:
 
 public:
 	CraneStepper();
+	void SetReversed(bool reversed) { _stepper->setReversed(reversed); }
 	void Init(MtsStepper* stepper);
 	void SetSpeed(float stepsPerSecond) { _stepper->setSpeedInStepsPerSecond(stepsPerSecond); }
 	void SetAcceleration(float stepsPerSecond) { _stepper->setAccelerationInStepsPerSecondPerSecond(stepsPerSecond); }

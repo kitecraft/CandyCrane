@@ -63,7 +63,8 @@ STEPPER_MOVE_ERROR CraneStepper::IsMiniumLimitReached()
 
 bool CraneStepper::Calibrate(int stepsPerSec)
 {
-	/*
+	_stepper->setCurrentPositionInSteps(GetMaximumStep() + 256);
+
 	if (!_usingLimitSwitch) {
 		return false;
 	}
@@ -73,9 +74,8 @@ bool CraneStepper::Calibrate(int stepsPerSec)
 		return false;
 	}
 
-	_stepper->moveRelativeInSteps(StepsForDistance(MM_FROM_SWITCH_FOR_HOME));
+	_stepper->setTargetPositionRelativeInSteps(StepsForDistance(MM_FROM_SWITCH_FOR_HOME));
 	_stepper->setCurrentPositionInSteps(0);
-	*/
 	return true;
 }
 
