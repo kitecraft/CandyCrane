@@ -41,7 +41,7 @@ public:
 	float GetCurrentPosition() { return _stepper->getCurrentPositionInSteps(); }
 
 	void SetCurrentPositionAsHome() { _stepper->setCurrentPositionInSteps(0); }
-	void SetCurrentPoistion(long pos) { _stepper->setCurrentPositionInSteps(pos); }
+	void SetCurrentPosition(long pos) { _stepper->setCurrentPositionInSteps(pos); }
 	bool IsLimitSwitchActive() { return ((digitalRead(_limitSwitchPin) == LOW) ? true : false); }
 	void DisableStepper() { _stepper->disable(); }
 	STEPPER_MOVE_ERROR IsMaximumLimitReached();

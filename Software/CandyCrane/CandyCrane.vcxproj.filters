@@ -15,7 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CandyCrane.ino" />
     <None Include="src\arduino folders read me.txt">
       <Filter>Misc Files</Filter>
     </None>
@@ -99,5 +98,6 @@
     <ClCompile Include="src\MultiTinyStepper\MultiTinyStepper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CandyCrane.ino" />
   </ItemGroup>
 </Project>

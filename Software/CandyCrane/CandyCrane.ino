@@ -45,6 +45,7 @@ void setup() {
         Serial.println("Failed to start crane controller.  As such, I will now refuse to continue.");
         while (true) { delay(1); }
     }
+
     xTaskCreate(CraneControllerThread, 
         "Crane Control Loop", 
         STACK_SIZE, nullptr, 

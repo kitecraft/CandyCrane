@@ -5,16 +5,23 @@ RopeBarrellStepper::RopeBarrellStepper()
 {
 }
 
-bool RopeBarrellStepper::Init(MtsStepper* stepper)
+bool RopeBarrellStepper::Init(MtsStepper* stepperR, MtsStepper* stepperL)
 {
 	_muxBucketDistance = portMUX_INITIALIZER_UNLOCKED;
 
-	_stepper.Init(stepper);
-	_stepper.SetReversed(true);
-	_stepper.SetStepsPerMM(ROPE_BARREL_STEPS_PER_MM);
-	_stepper.SetMaximumDistance(ROPE_BARREL_MAXIMUM_DISTANCE);
-	_stepper.SetSpeed(ROPE_BARREL_SPEED_STEPS_SECOND);
-	_stepper.SetAcceleration(ROPE_BARREL_ACCEL_STEPS_SECOND);
+	_stepperR.Init(stepperR);
+	_stepperR.SetReversed(ROPE_BARREL_STEPPER_R_DIR);
+	_stepperR.SetStepsPerMM(ROPE_BARREL_STEPS_PER_MM);
+	_stepperR.SetMaximumDistance(ROPE_BARREL_MAXIMUM_DISTANCE);
+	_stepperR.SetSpeed(ROPE_BARREL_SPEED_STEPS_SECOND);
+	_stepperR.SetAcceleration(ROPE_BARREL_ACCEL_STEPS_SECOND);
+
+	_stepperL.Init(stepperL);
+	_stepperL.SetReversed(ROPE_BARREL_STEPPER_L_DIR);
+	_stepperL.SetStepsPerMM(ROPE_BARREL_STEPS_PER_MM);
+	_stepperL.SetMaximumDistance(ROPE_BARREL_MAXIMUM_DISTANCE);
+	_stepperL.SetSpeed(ROPE_BARREL_SPEED_STEPS_SECOND);
+	_stepperL.SetAcceleration(ROPE_BARREL_ACCEL_STEPS_SECOND);
 
 	return true;
 }
@@ -60,6 +67,7 @@ void RopeBarrellStepper::SetBucketDistance(int distance)
 bool RopeBarrellStepper::Calibrate()
 {
 	Serial.println("\nStarting Rope barrell calibration");
+	
 	if (!FetchBucketDistance())
 	{
 		Serial.println("CalibrateBucket(): Failed to get bucket distance.");
@@ -69,29 +77,32 @@ bool RopeBarrellStepper::Calibrate()
 	Serial.print("Got distance: ");
 	Serial.println(_bucketDistance);
 	while (_bucketDistance < 60) {
-		_stepper.MoveOutMM(20);
-		while (_stepper.IsInMotion())
+		MoveOutMM(20);
+		while (IsInMotion())
 		{
-			_stepper.Process();
+			_stepperR.Process();
+			_stepperL.Process();
 			vTaskDelay(1);
 		}
 		FetchBucketDistance();
 	}
+	
 
-	_stepper.SetCurrentPoistion(_stepper.StepsForDistance(ROPE_BARREL_MAXIMUM_DISTANCE) * 2);
+	SetCurrentPosition(_stepperR.StepsForDistance(ROPE_BARREL_MAXIMUM_DISTANCE) * 2);
 	float distanceToMove = _bucketDistance - BUCKET_DEFAULT_DISTANCE;
 
 	Serial.printf("Moving bucket %f mm\n", distanceToMove);
 	if (distanceToMove > 0) {
-		_stepper.MoveInMM(distanceToMove);
+		MoveInMM(distanceToMove);
 	}
 	else {
-		_stepper.MoveOutMM(distanceToMove * -1);
+		MoveOutMM(distanceToMove * -1);
 	}
 
-	while(_stepper.IsInMotion())
+	while(IsInMotion())
 	{
-		_stepper.Process();
+		_stepperR.Process();
+		_stepperL.Process();
 		vTaskDelay(1);
 	}
 	if (!FetchBucketDistance())
@@ -100,7 +111,7 @@ bool RopeBarrellStepper::Calibrate()
 		return false;
 	}
 	Serial.printf("Calibrate(): Final Bucket distance is: '%f'\n\n\n--------\n", _bucketDistance);
-	_stepper.SetCurrentPositionAsHome();
+	SetCurrentPositionAsHome();
 	
 	return true;
 }

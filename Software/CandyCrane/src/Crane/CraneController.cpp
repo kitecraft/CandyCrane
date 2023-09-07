@@ -19,6 +19,7 @@ bool CraneController::StartUp()
 
 	//Wire.begin(4, 5, 1000000);
 	_stepperController.begin(Wire, MULTITINYSTEPPER_RESET_PIN, MCP23017_DEFAULT_ADDR);
+	_stepperController.setGlobalControl(true);
 	
 	_dolly.Init(_stepperController.getStepper(MTS_STEPPER_3)); 
 	//_dolly.SetReversed(true);
@@ -28,7 +29,7 @@ bool CraneController::StartUp()
 	_dolly.SetSpeed(DOLLY_SPEED_STEPS_SECOND);
 	_dolly.SetAcceleration(DOLLY_ACCEL_STEPS_SECOND);
 
-	_tower.Init(_stepperController.getStepper(MTS_STEPPER_1));
+	_tower.Init(_stepperController.getStepper(MTS_STEPPER_4));
 	_tower.SetReversed(true);
 	_tower.ConnectToLimitSwitch(TOWER_LIMIT_SWITCH_PIN);
 	_tower.SetStepsPerMM(TOWER_STEPS_PER_MM);
@@ -36,7 +37,7 @@ bool CraneController::StartUp()
 	_tower.SetSpeed(TOWER_SPEED_STEPS_SECOND);
 	_tower.SetAcceleration(TOWER_ACCEL_STEPS_SECOND);
 
-	_ropebarrel.Init(_stepperController.getStepper(MTS_STEPPER_2));
+	_ropebarrel.Init(_stepperController.getStepper(ROPE_BARREL_STEPPER_R), _stepperController.getStepper(ROPE_BARREL_STEPPER_L));
 	_ropebarrel.setCallback([this]() { RequestDistance(); });
 
 	_candyRanger.Init();
@@ -58,9 +59,8 @@ bool CraneController::StartUp()
 		return false;
 	}
 	*/
-
+	
 	return true;
-
 }
 
 bool CraneController::CalibrateBucket()
@@ -77,6 +77,7 @@ bool CraneController::CalibrateBucket()
 bool CraneController::CalibrateAll()
 {
 	_stepperController.Reset();
+	_stepperController.setGlobalControl(false);
 	Serial.println("Calibrating bucket");
 	CalibrateBucket();
 	
@@ -84,19 +85,25 @@ bool CraneController::CalibrateAll()
 	if (!_dolly.Calibrate(DOLLY_CALIBRATION_SPEED))
 	{
 		return false;
+		Serial.println("Dolly calibration failed");
+		_stepperController.setGlobalControl(true);
 	}
 
 	Serial.println("Calibrating tower");
 	if (!_tower.Calibrate(TOWER_CALIBRATION_SPEED))
 	{
 		return false;
+		Serial.println("Tower calibration failed");
+		_stepperController.setGlobalControl(true);
 	}
 
 	_tower.DisableStepper();
 	_dolly.DisableStepper();
 	_ropebarrel.Disable();
 
+	_stepperController.setGlobalControl(true);
 	Serial.println("Ending Calibration");
+
 	return true;
 }
 
@@ -178,9 +185,12 @@ void CraneController::Run()
 		}
 		
 		if (_bucketConnected) {
+			_stepperController.processAll();
+			/*
 			_dolly.Process();
 			_ropebarrel.Process();
 			_tower.Process();
+			*/
 		} 
 		vTaskDelay(1);
 	}

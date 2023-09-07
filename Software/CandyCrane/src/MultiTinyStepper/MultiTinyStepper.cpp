@@ -27,8 +27,9 @@ void MultiTinyStepper::begin(TwoWire& wire, int8_t resetPin, int address)
 void MultiTinyStepper::Reset()
 {
 	digitalWrite(_resetPin, LOW);
-	delay(200);
+	delay(100);
 	digitalWrite(_resetPin, HIGH);
+	delay(100);
 
 	_mcp.init(_address, *_wire);
 	_mcp.portMode(MCP23017Port::A, 0);
@@ -64,7 +65,10 @@ void MultiTinyStepper::processStepper1(uint8_t phase, uint8_t stepType, bool rev
 	uint16_t copy = _portB;
 	portEXIT_CRITICAL(&_mutex);
 
-	_mcp.writePort(MCP23017Port::B, copy);
+	if (!_globalControl)
+	{
+		_mcp.writePort(MCP23017Port::B, copy);
+	}
 }
 
 void MultiTinyStepper::processStepper2(uint8_t phase, uint8_t stepType, bool reversed)
@@ -82,7 +86,10 @@ void MultiTinyStepper::processStepper2(uint8_t phase, uint8_t stepType, bool rev
 	uint16_t copy = _portB;
 	portEXIT_CRITICAL(&_mutex);
 
-	_mcp.writePort(MCP23017Port::B, copy);
+	if (!_globalControl)
+	{
+		_mcp.writePort(MCP23017Port::B, copy);
+	}
 }
 
 void MultiTinyStepper::processStepper3(uint8_t phase, uint8_t stepType, bool reversed)
@@ -100,7 +107,10 @@ void MultiTinyStepper::processStepper3(uint8_t phase, uint8_t stepType, bool rev
 	uint16_t copy = _portA;
 	portEXIT_CRITICAL(&_mutex);
 
-	_mcp.writePort(MCP23017Port::A, copy);
+	if (!_globalControl)
+	{
+		_mcp.writePort(MCP23017Port::A, copy);
+	}
 }
 
 void MultiTinyStepper::processStepper4(uint8_t phase, uint8_t stepType, bool reversed)
@@ -118,7 +128,27 @@ void MultiTinyStepper::processStepper4(uint8_t phase, uint8_t stepType, bool rev
 	uint16_t copy = _portA;
 	portEXIT_CRITICAL(&_mutex);
 
-	_mcp.writePort(MCP23017Port::A, copy);
+	if (!_globalControl)
+	{
+		_mcp.writePort(MCP23017Port::A, copy);
+	}
+}
+
+bool MultiTinyStepper::processAll()
+{
+	bool ret = false;
+
+	for (int i = 0; i < MTS_STEPPER_COUNT; i++) {
+		if (_stepperInUse[i]) {
+			if (_steppers[i].process()) {
+				ret = true;
+			}
+		}
+	}
+
+	_mcp.writePort(MCP23017Port::A, _portA);
+	_mcp.writePort(MCP23017Port::B, _portB);
+	return ret;
 }
 
 uint8_t MultiTinyStepper::getFullStepForPhase(uint8_t phase, bool reversed)

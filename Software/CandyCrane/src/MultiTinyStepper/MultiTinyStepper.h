@@ -15,9 +15,12 @@ class MultiTinyStepper
 private:
 	MCP23017 _mcp;
 	MtsStepper _steppers[MTS_STEPPER_COUNT];
+	bool _stepperInUse[MTS_STEPPER_COUNT] = { false };
 	int _address = 0;
 	int8_t _resetPin = -1;
 	TwoWire* _wire;
+
+	bool _globalControl = false;
 
 	uint8_t _portA = 0;
 	uint8_t _portB = 0;
@@ -49,5 +52,16 @@ public:
 	* Do not delete it.
 	*/
 	MtsStepper* getStepper(MTS_STEPPER_ID stepperId);
+
+	/*
+	* When global control is on, you must all processAll()
+	* When off, you must call each steepers process()
+	*/
+	void setGlobalControl(bool global) { _globalControl = global; }
+
+	/*
+	* Process All stepper motors simultaneously
+	*/
+	bool processAll();
 };
 

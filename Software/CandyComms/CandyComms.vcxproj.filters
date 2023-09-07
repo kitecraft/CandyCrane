@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CandyComms.ino" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="__vm\.CandyComms.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -41,5 +38,6 @@
     <ClCompile Include="src\ESPNow\EspNowIncomingMessageQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CandyComms.ino" />
   </ItemGroup>
 </Project>
