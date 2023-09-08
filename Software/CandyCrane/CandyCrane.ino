@@ -33,8 +33,8 @@ void setup() {
     Serial.begin(115200);
     Serial.printf("\n\n----- %s v%s -----\n\n", __DEVICE_NAME__, __DEVICE_VERSION__);
 
-    Wire.begin();
-    Wire.setClock(700000);
+    //Wire.begin();
+    //Wire.setClock(700000);
 
     StartNetworkStuff();
     Serial.println(WiFi.macAddress());
@@ -46,11 +46,13 @@ void setup() {
         while (true) { delay(1); }
     }
 
+    
     xTaskCreate(CraneControllerThread, 
         "Crane Control Loop", 
         STACK_SIZE, nullptr, 
         CRANE_CONTROL_PRIORITY, 
         &g_CraneControllerHandle);
+        
 }
 
 
@@ -62,10 +64,10 @@ bool towerDirection = DIR_OUT;
 
 void loop() {
     
-    if (g_craneController.GetAutoCraneStatus()) {
-        //Serial.printf("Crane is in auto mode: %i\n", g_AutoCraneCurrentStep);
-        g_AutoCraneStepList[g_AutoCraneCurrentStep]();
-    }
+    //if (g_craneController.GetAutoCraneStatus()) {
+    //    //Serial.printf("Crane is in auto mode: %i\n", g_AutoCraneCurrentStep);
+    //    g_AutoCraneStepList[g_AutoCraneCurrentStep]();
+    //}
     
 
 

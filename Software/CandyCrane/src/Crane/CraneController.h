@@ -3,7 +3,6 @@
 #include <WiFiServer.h>
 #include "../CC_Config.h"
 #include "RopeBarrellStepper.h"
-#include "../MultiTinyStepper/MultiTinyStepper.h"
 #include "../Utilities/CraneStepper.h"
 #include "CandyRanger.h"
 #include "CandyCraneCommands.h"
@@ -30,7 +29,6 @@ private:
 	bool OpenCloseBucket(int moveToAngle, int moveSpeed, bool async = false);
 	void ParseMessage(String message);
 
-	MultiTinyStepper _stepperController;
 	RopeBarrellStepper _ropebarrel;
 	CraneStepper _dolly;
 	CraneStepper _tower;
@@ -55,8 +53,8 @@ public:
 	void StopAll() { StopDolly(); StopTowerMotion(); StopBucketMotion(); _CraneInAutoMode = false; }
 	void DisableAll() { _dolly.DisableStepper(); _tower.DisableStepper(); _ropebarrel.Disable(); }
 
-	void MoveDollyOutwards() { _dolly.MoveOut(); }
-	void MoveDollyInwards(){ _dolly.MoveIn(); }
+	void MoveDollyOutwards() { /*_dolly.MoveOut();*/ _dolly.MoveOutMM(100); }
+	void MoveDollyInwards() { /*_dolly.MoveIn();*/ _dolly.MoveInMM(100); }
 	void MoveDollyTo(int mmFromHome) { _dolly.MoveToMM(mmFromHome); }
 	void StopDolly() { _dolly.DeadStop(); }
 	bool IsDollyInMotion() { return _dolly.IsInMotion(); }

@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include "../CC_Config.h"
-#include "../MultiTinyStepper/MtsStepper.h"
+#include "../Utilities/SmallFlexyStepper.h"
 
 #define DIRECTION_OUT 1
 #define DIRECTION_IN -1
@@ -10,7 +10,7 @@
 class CraneStepper
 {
 private:
-	MtsStepper* _stepper;
+	SmallFlexyStepper* _stepper;
 
 	bool _isInMotion = false;
 	portMUX_TYPE _muxMotion;
@@ -25,8 +25,7 @@ private:
 
 public:
 	CraneStepper();
-	void SetReversed(bool reversed) { _stepper->setReversed(reversed); }
-	void Init(MtsStepper* stepper);
+	void Init(byte inPin1, byte inPin2, byte inPin3, byte inPin4);
 	void SetSpeed(float stepsPerSecond) { _stepper->setSpeedInStepsPerSecond(stepsPerSecond); }
 	void SetAcceleration(float stepsPerSecond) { _stepper->setAccelerationInStepsPerSecondPerSecond(stepsPerSecond); }
 	void ConnectToLimitSwitch(byte pinNumber);

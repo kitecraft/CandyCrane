@@ -18,30 +18,32 @@ bool CraneController::StartUp()
 	_muxBucketOpenClose = portMUX_INITIALIZER_UNLOCKED;
 
 	//Wire.begin(4, 5, 1000000);
-	_stepperController.begin(Wire, MULTITINYSTEPPER_RESET_PIN, MCP23017_DEFAULT_ADDR);
-	_stepperController.setGlobalControl(true);
 	
-	_dolly.Init(_stepperController.getStepper(MTS_STEPPER_3)); 
-	//_dolly.SetReversed(true);
+	Serial.println("Init the dolly");
+	_dolly.Init(DOLLY_STEPPER_PIN_1, DOLLY_STEPPER_PIN_2, DOLLY_STEPPER_PIN_3, DOLLY_STEPPER_PIN_4);
 	_dolly.ConnectToLimitSwitch(DOLLY_LIMIT_SWITCH_PIN);
 	_dolly.SetStepsPerMM(DOLLY_STEPS_PER_MM);
 	_dolly.SetMaximumDistance(DOLLY_MAXIMUM_DISTANCE);
 	_dolly.SetSpeed(DOLLY_SPEED_STEPS_SECOND);
 	_dolly.SetAcceleration(DOLLY_ACCEL_STEPS_SECOND);
-
-	_tower.Init(_stepperController.getStepper(MTS_STEPPER_4));
-	_tower.SetReversed(true);
+	
+	/*
+	_tower.Init(TOWER_STEPPER_PIN_1, TOWER_STEPPER_PIN_2, TOWER_STEPPER_PIN_3, TOWER_STEPPER_PIN_4);
+	//_tower.SetReversed(true);
 	_tower.ConnectToLimitSwitch(TOWER_LIMIT_SWITCH_PIN);
 	_tower.SetStepsPerMM(TOWER_STEPS_PER_MM);
 	_tower.SetMaximumDistance(TOWER_MAXIMUM_DISTANCE);
 	_tower.SetSpeed(TOWER_SPEED_STEPS_SECOND);
 	_tower.SetAcceleration(TOWER_ACCEL_STEPS_SECOND);
 
-	_ropebarrel.Init(_stepperController.getStepper(ROPE_BARREL_STEPPER_R), _stepperController.getStepper(ROPE_BARREL_STEPPER_L));
+	_ropebarrel.Init();
 	_ropebarrel.setCallback([this]() { RequestDistance(); });
+	*/
 
-	_candyRanger.Init();
+	//this is the distance sensor that measure the candy level
+	//_candyRanger.Init();
 
+	/*
 	xTaskCreate(
 		tcpServerThread,
 		"TCPServer",
@@ -49,17 +51,17 @@ bool CraneController::StartUp()
 		this,
 		tskIDLE_PRIORITY + 8,
 		&_tcpServerThreadHandle);
-	
+	*/
+
+
 	//CalibrateBucket();
 
-	/*
+	
 	if (!CalibrateAll())
 	{
 		Serial.println("CraneController::StartUp() - Failed to calibrate");
 		return false;
 	}
-	*/
-	
 	return true;
 }
 
@@ -76,32 +78,28 @@ bool CraneController::CalibrateBucket()
 
 bool CraneController::CalibrateAll()
 {
-	_stepperController.Reset();
-	_stepperController.setGlobalControl(false);
-	Serial.println("Calibrating bucket");
-	CalibrateBucket();
+	//Serial.println("Calibrating bucket");
+	//CalibrateBucket();
 	
 	Serial.println("Calibrating dolly");
 	if (!_dolly.Calibrate(DOLLY_CALIBRATION_SPEED))
 	{
 		return false;
 		Serial.println("Dolly calibration failed");
-		_stepperController.setGlobalControl(true);
 	}
 
+	/*
 	Serial.println("Calibrating tower");
 	if (!_tower.Calibrate(TOWER_CALIBRATION_SPEED))
 	{
 		return false;
 		Serial.println("Tower calibration failed");
-		_stepperController.setGlobalControl(true);
 	}
+	*/
 
-	_tower.DisableStepper();
+	//_tower.DisableStepper();
 	_dolly.DisableStepper();
-	_ropebarrel.Disable();
 
-	_stepperController.setGlobalControl(true);
 	Serial.println("Ending Calibration");
 
 	return true;
@@ -177,21 +175,22 @@ void CraneController::Run()
 	while (true) {
 		if (_bucketConnected && !bucketConnectionPreviousState) {
 			Serial.println("Bucket has connected, starting calibration");
-			CalibrateAll();
+			//CalibrateAll();
 			bucketConnectionPreviousState = _bucketConnected;
 		}
 		else if(!_bucketConnected && bucketConnectionPreviousState) {
 			bucketConnectionPreviousState = false;
 		}
 		
-		if (_bucketConnected) {
-			_stepperController.processAll();
-			/*
-			_dolly.Process();
+		//if (_bucketConnected) {
+		_dolly.Process();
+		/*
+			
+			
 			_ropebarrel.Process();
 			_tower.Process();
 			*/
-		} 
+		//} 
 		vTaskDelay(1);
 	}
 }
@@ -205,6 +204,7 @@ void CraneController::RunTCPServer()
 	Serial.println("Started...");
 
 	while (true) {
+		/*
 		if (!_bucketConnected) {
 			WaitforBucketConnect();
 		}
@@ -217,6 +217,7 @@ void CraneController::RunTCPServer()
 				ParseMessage(message);
 			}
 		}
+		*/
 		vTaskDelay(50);
 	}
 }

@@ -5,10 +5,11 @@ CraneStepper::CraneStepper()
 
 }
 
-void CraneStepper::Init(MtsStepper* stepper)
+void CraneStepper::Init(byte inPin1, byte inPin2, byte inPin3, byte inPin4)
 {
 	_muxMotion = portMUX_INITIALIZER_UNLOCKED;
-	_stepper = stepper;
+	_stepper = new SmallFlexyStepper();
+	_stepper->connectToPins(inPin1, inPin2, inPin3, inPin4);
 }
 
 void CraneStepper::ConnectToLimitSwitch(byte pinNumber)
@@ -63,25 +64,37 @@ STEPPER_MOVE_ERROR CraneStepper::IsMiniumLimitReached()
 
 bool CraneStepper::Calibrate(int stepsPerSec)
 {
+	Serial.println("Starting calibration routine.");
 	_stepper->setCurrentPositionInSteps(GetMaximumStep() + 256);
 
 	if (!_usingLimitSwitch) {
+		Serial.println("No limit switch set.  Exiting");
 		return false;
 	}
 
+	Serial.println("Moveing to home");
 	if (!_stepper->moveToHomeInSteps(DIRECTION_IN, stepsPerSec, GetMaximumStep() + 256, _limitSwitchPin))
 	{
+		Serial.println("Failed to move to home!");
 		return false;
 	}
 
 	_stepper->setTargetPositionRelativeInSteps(StepsForDistance(MM_FROM_SWITCH_FOR_HOME));
+
+	while (!_stepper->processMovement())
+	{
+		vTaskDelay(1);
+	}
+
 	_stepper->setCurrentPositionInSteps(0);
+
+	Serial.println("Calibration successfull.");
 	return true;
 }
 
 STEPPER_MOVE_ERROR CraneStepper::MoveOut()
 {
-	//Serial.println("Moving this outwards");
+	Serial.println("Moving this outwards");
 	STEPPER_MOVE_ERROR state = IsMaximumLimitReached();
 	if (state != SME_NONE) {
 		return state;
@@ -89,7 +102,7 @@ STEPPER_MOVE_ERROR CraneStepper::MoveOut()
 	_direction = DIRECTION_OUT;
 	_stepper->setTargetPositionInSteps(GetMaximumStep());
 	SetMotionStatus(true);
-	//Serial.printf("Current: %i to: %i\n", _stepper->getCurrentPositionInSteps(), GetMaximumStep());
+	Serial.printf("Current: %i to: %i\n", _stepper->getCurrentPositionInSteps(), GetMaximumStep());
 	return SME_NONE;
 }
 
@@ -183,7 +196,7 @@ STEPPER_MOVE_ERROR CraneStepper::Process()
 
 		if (!_stepper->motionComplete())
 		{
-			_stepper->process();
+			_stepper->processMovement();
 		}
 		else {
 			//Serial.printf("Motion is complete. Steps: %i\n", _stepper->getCurrentPositionInSteps());
